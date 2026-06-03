@@ -46,6 +46,7 @@ export async function registerWithFirebase({ email, name, password }) {
     is_admin: email.includes('admin'),
     friend_code: getFriendCode(credential.user.uid),
     friend_ids: [],
+    earned_achievement_ids: [],
     created_at: new Date().toISOString(),
   }
 
@@ -78,6 +79,7 @@ export async function ensureUserDocument(firebaseUser) {
     is_admin: firebaseUser.email?.includes('admin') ?? false,
     friend_code: getFriendCode(firebaseUser.uid),
     friend_ids: [],
+    earned_achievement_ids: [],
     created_at: new Date().toISOString(),
   }
 
@@ -90,6 +92,7 @@ export async function ensureUserDocument(firebaseUser) {
         friend_code: current.friend_code ?? getFriendCode(firebaseUser.uid),
         friend_ids: current.friend_ids ?? [],
         best_streak: current.best_streak ?? current.streak ?? 0,
+        earned_achievement_ids: current.earned_achievement_ids ?? [],
       },
       { merge: true },
     )

@@ -4,8 +4,9 @@ import { AppShell } from './components/AppShell'
 import { FeedbackModal } from './components/FeedbackModal'
 import { LevelUpModal } from './components/LevelUpModal'
 import { MissionActionModal } from './components/MissionActionModal'
-import { emptyProfile, badgeRules } from './data/appData'
+import { emptyProfile } from './data/appData'
 import { initialMissions } from './data/missions'
+import { evaluateAchievements, flattenEarnedAchievements } from './lib/achievements'
 import { todayKey } from './lib/date'
 import {
   addMissionLog,
@@ -61,6 +62,14 @@ function App() {
   const progress = getLevelProgress(user?.total_xp ?? 0)
   const leaderboard = getLeaderboard(users, logs)
   const visiblePage = activePage === 'admin' && user && !user.is_admin ? 'dashboard' : activePage
+  const achievementGroups = useMemo(
+    () => (user ? evaluateAchievements({ logs, profile, user }) : []),
+    [logs, profile, user],
+  )
+  const earnedAchievements = useMemo(
+    () => flattenEarnedAchievements(achievementGroups),
+    [achievementGroups],
+  )
   const missionMap = useMemo(
     () => Object.fromEntries(missions.map((mission) => [mission.id, mission])),
     [missions],
@@ -118,6 +127,28 @@ function App() {
     })
   }, [authUser, logs, missions, profile, todayMissions.length])
 
+  useEffect(() => {
+    if (!user || earnedAchievements.length === 0) return
+
+    const claimed = user.earned_achievement_ids ?? []
+    const newlyEarned = earnedAchievements.filter((achievement) => !claimed.includes(achievement.id))
+    if (newlyEarned.length === 0) return
+
+    const bonusXp = newlyEarned.reduce((total, achievement) => {
+      const match = achievement.reward.match(/(\d+)/)
+      return total + (match ? Number(match[1]) : 0)
+    }, 0)
+    const nextXp = user.total_xp + bonusXp
+
+    updateUser(user.id, {
+      earned_achievement_ids: [...claimed, ...newlyEarned.map((achievement) => achievement.id)],
+      total_xp: nextXp,
+      level: getLevelFromXp(nextXp),
+    }).catch((error) => {
+      console.warn('Achievement reward skipped:', error.message)
+    })
+  }, [earnedAchievements, user])
+
   async function register(form) {
     const data = new FormData(form)
     const email = data.get('email').trim().toLowerCase()
@@ -160,8 +191,9 @@ function App() {
     await saveProfile(authUser.uid, { ...nextProfile, onboarding_completed: true })
   }
 
-  function requestMissionAction(action, dailyMission) {
-    setPendingAction({ action, dailyMission })
+  function requestMissionAction(action, dailyMission, source = 'daily', missionOverride = null) {
+    const mission = missionOverride ?? missionMap[dailyMission.mission_id]
+    setPendingAction({ action, dailyMission, mission, source })
   }
 
   async function completeMission(dailyMission) {
@@ -224,13 +256,47 @@ function App() {
     })
   }
 
+  async function completeEventMission(eventMission) {
+    const completedAt = new Date().toISOString()
+    const nextXp = user.total_xp + eventMission.xp_reward
+    const nextLevel = getLevelFromXp(nextXp)
+
+    await addMissionLog({
+      user_id: user.id,
+      mission_id: eventMission.id,
+      title: eventMission.title,
+      category: eventMission.category,
+      source: 'event',
+      event_category: eventMission.event_category,
+      status: 'completed',
+      completed: true,
+      skipped: false,
+      rating: null,
+      feedback: '',
+      duration_actual: eventMission.duration_minutes,
+      recommended_score: 0,
+      time_completed: completedAt,
+      created_at: completedAt,
+    })
+    await updateUser(user.id, {
+      total_xp: nextXp,
+      level: nextLevel,
+    })
+
+    if (nextLevel > user.level) setLevelUp(nextLevel)
+  }
+
   async function confirmMissionAction(reason) {
     if (!pendingAction) return
     setActionBusy(true)
 
     try {
       if (pendingAction.action === 'complete') {
-        await completeMission(pendingAction.dailyMission)
+        if (pendingAction.source === 'event') {
+          await completeEventMission(pendingAction.mission)
+        } else {
+          await completeMission(pendingAction.dailyMission)
+        }
       } else {
         await skipMission(pendingAction.dailyMission, reason)
       }
@@ -240,16 +306,6 @@ function App() {
     } finally {
       setActionBusy(false)
     }
-  }
-
-  function earnedBadges() {
-    const completed = logs.filter((log) => log.status === 'completed').length
-    return badgeRules.filter((badge) => {
-      if (badge.id === 'first-step') return completed >= 1
-      if (badge.id === 'streak-3') return user?.streak >= 3
-      if (badge.id === 'level-3') return user?.level >= 3
-      return false
-    })
   }
 
   async function handleMissionChange(updater) {
@@ -312,7 +368,7 @@ function App() {
     >
       {visiblePage === 'dashboard' && (
         <Dashboard
-          badges={earnedBadges()}
+          badges={earnedAchievements}
           dailyMissions={todayMissions}
           missionMap={missionMap}
           onComplete={(dailyMission) => requestMissionAction('complete', dailyMission)}
@@ -334,11 +390,19 @@ function App() {
         <Friends onAddFriend={addFriend} user={user} users={users} />
       )}
       {visiblePage === 'event' && (
-        <Event />
+        <Event
+          completedEventIds={logs
+            .filter((log) => log.source === 'event' && log.status === 'completed')
+            .map((log) => log.mission_id)}
+          onComplete={(eventMission) =>
+            requestMissionAction('complete', { mission_id: eventMission.id }, 'event', eventMission)
+          }
+        />
       )}
       {visiblePage === 'profile' && (
         <Profile
-          badges={earnedBadges()}
+          achievementGroups={achievementGroups}
+          badges={earnedAchievements}
           onSave={(nextProfile) => saveProfile(user.id, nextProfile)}
           profile={profile}
           user={user}
@@ -367,7 +431,7 @@ function App() {
       {pendingAction && (
         <MissionActionModal
           action={pendingAction.action}
-          mission={missionMap[pendingAction.dailyMission.mission_id]}
+          mission={pendingAction.mission}
           onCancel={() => setPendingAction(null)}
           onConfirm={confirmMissionAction}
           pending={actionBusy}

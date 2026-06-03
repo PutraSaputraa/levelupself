@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react'
 
 export function Friends({ onAddFriend, user, users }) {
   const [query, setQuery] = useState('')
+  const [submittedQuery, setSubmittedQuery] = useState('')
   const friendIds = user.friend_ids ?? []
   const friends = users.filter((candidate) => friendIds.includes(candidate.id))
   const suggestions = useMemo(() => {
-    const term = query.trim().toLowerCase()
+    const term = submittedQuery.trim().toLowerCase()
     if (!term) return []
 
     return users
@@ -16,7 +17,7 @@ export function Friends({ onAddFriend, user, users }) {
         return name.includes(term) || code.includes(term)
       })
       .slice(0, 6)
-  }, [query, user.id, users])
+  }, [submittedQuery, user.id, users])
 
   return (
     <div className="page-stack">
@@ -41,17 +42,28 @@ export function Friends({ onAddFriend, user, users }) {
             <h2>Cari user</h2>
           </div>
         </div>
-        <label className="field">
-          <span>ID teman atau nama user</span>
-          <input
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Contoh: LUS-ABC12345 atau Kaputra"
-            type="text"
-            value={query}
-          />
-        </label>
+        <form
+          className="friend-search-form"
+          onSubmit={(event) => {
+            event.preventDefault()
+            setSubmittedQuery(query)
+          }}
+        >
+          <label className="field">
+            <span>ID teman atau nama user</span>
+            <input
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder=""
+              type="text"
+              value={query}
+            />
+          </label>
+          <button className="primary" type="submit">
+            Cari
+          </button>
+        </form>
         <div className="friend-search-list">
-          {query && suggestions.length === 0 && <p>User belum ditemukan.</p>}
+          {submittedQuery && suggestions.length === 0 && <p>User belum ditemukan.</p>}
           {suggestions.map((candidate) => {
             const alreadyFriend = friendIds.includes(candidate.id)
 

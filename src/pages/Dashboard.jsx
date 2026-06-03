@@ -1,6 +1,5 @@
 import { HistoryPanel } from '../components/HistoryPanel'
 import { MissionCard } from '../components/MissionCard'
-import { badgeRules } from '../data/appData'
 import { classNames } from '../lib/classNames'
 import { todayKey } from '../lib/date'
 
@@ -56,18 +55,16 @@ export function Dashboard({
         <div className="panel badge-panel">
           <h2>Badge</h2>
           <div className="badges">
-            {badgeRules.map((badge) => (
+            {badges.slice(0, 5).map((badge) => (
               <div
-                className={classNames(
-                  'badge',
-                  badges.some((item) => item.id === badge.id) && 'earned',
-                )}
+                className={classNames('badge', 'earned')}
                 key={badge.id}
               >
                 <strong>{badge.name}</strong>
                 <span>{badge.description}</span>
               </div>
             ))}
+            {badges.length === 0 && <p>Belum ada badge aktif.</p>}
           </div>
         </div>
       </section>

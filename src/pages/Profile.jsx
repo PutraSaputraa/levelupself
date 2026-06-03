@@ -3,7 +3,7 @@ import { ChoiceGroup } from '../components/ChoiceGroup'
 import { surveyOptions } from '../data/appData'
 import { classNames } from '../lib/classNames'
 
-export function Profile({ badges, onSave, profile, user, userLogs }) {
+export function Profile({ achievementGroups, badges, onSave, profile, user, userLogs }) {
   const [draft, setDraft] = useState(profile)
   const completed = userLogs.filter((log) => log.status === 'completed').length
 
@@ -63,16 +63,25 @@ export function Profile({ badges, onSave, profile, user, userLogs }) {
         <div className="section-head">
           <div>
             <span className="eyebrow">Achievements</span>
-            <h2>Badge</h2>
+            <h2>Achievement</h2>
           </div>
-          <span className="date-chip">{badges.length} aktif</span>
+          <span className="date-chip">{badges.length} terbuka</span>
         </div>
-        <div className="badges profile-badges">
-          {badges.length === 0 && <p>Belum ada badge. Selesaikan misi pertama untuk mulai.</p>}
-          {badges.map((badge) => (
-            <div className={classNames('badge', 'earned')} key={badge.id}>
-              <strong>{badge.name}</strong>
-              <span>{badge.description}</span>
+        <div className="achievement-groups">
+          {achievementGroups.map((group) => (
+            <div className="achievement-group" key={group.id}>
+              <h3>{group.title}</h3>
+              <div className="achievement-list">
+                {group.items.map((item) => (
+                  <div className={classNames('achievement-row', item.earned && 'earned')} key={item.id}>
+                    <div>
+                      <strong>{item.name}</strong>
+                      <span>{item.description}</span>
+                    </div>
+                    <span className="achievement-reward">{item.reward}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
