@@ -60,6 +60,7 @@ function App() {
 
   const progress = getLevelProgress(user?.total_xp ?? 0)
   const leaderboard = getLeaderboard(users, logs)
+  const visiblePage = activePage === 'admin' && user && !user.is_admin ? 'dashboard' : activePage
   const missionMap = useMemo(
     () => Object.fromEntries(missions.map((mission) => [mission.id, mission])),
     [missions],
@@ -287,11 +288,12 @@ function App() {
 
   return (
     <AppShell
-      activePage={activePage}
+      activePage={visiblePage}
+      isAdmin={user.is_admin}
       onLogout={logoutFromFirebase}
       onNavigate={setActivePage}
     >
-      {activePage === 'dashboard' && (
+      {visiblePage === 'dashboard' && (
         <Dashboard
           badges={earnedBadges()}
           dailyMissions={todayMissions}
@@ -307,7 +309,7 @@ function App() {
           userLogs={logs}
         />
       )}
-      {activePage === 'missions' && (
+      {visiblePage === 'missions' && (
         <MissionDetail
           dailyMissions={todayMissions}
           missionMap={missionMap}
@@ -317,18 +319,18 @@ function App() {
           selectedMission={selectedMission}
         />
       )}
-      {activePage === 'progress' && <Progress user={user} userLogs={logs} />}
-      {activePage === 'leaderboard' && (
+      {visiblePage === 'progress' && <Progress user={user} userLogs={logs} />}
+      {visiblePage === 'leaderboard' && (
         <Leaderboard currentUserId={user.id} leaderboard={leaderboard} />
       )}
-      {activePage === 'profile' && (
+      {visiblePage === 'profile' && (
         <Profile
           onSave={(nextProfile) => saveProfile(user.id, nextProfile)}
           profile={profile}
           user={user}
         />
       )}
-      {activePage === 'admin' && (
+      {visiblePage === 'admin' && (
         <Admin missions={missions} onChange={handleMissionChange} user={user} />
       )}
 

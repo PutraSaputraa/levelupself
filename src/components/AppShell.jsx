@@ -6,10 +6,11 @@ const navItems = [
   ['progress', 'Progress'],
   ['leaderboard', 'Leaderboard'],
   ['profile', 'Profile'],
-  ['admin', 'Admin'],
 ]
 
-export function AppShell({ activePage, children, onLogout, onNavigate }) {
+export function AppShell({ activePage, children, isAdmin, onLogout, onNavigate }) {
+  const visibleNavItems = isAdmin ? [...navItems, ['admin', 'Admin']] : navItems
+
   return (
     <main className="app-shell">
       <aside className="sidebar">
@@ -21,7 +22,7 @@ export function AppShell({ activePage, children, onLogout, onNavigate }) {
           </div>
         </div>
         <nav>
-          {navItems.map(([page, label]) => (
+          {visibleNavItems.map(([page, label]) => (
             <button
               className={classNames(activePage === page && 'active')}
               key={page}
