@@ -18,6 +18,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  increment,
 } from 'firebase/firestore'
 import { emptyProfile } from '../data/appData'
 import { initialMissions } from '../data/missions'
@@ -40,6 +41,11 @@ export async function registerWithFirebase({ email, name, password }) {
     name,
     email,
     total_xp: 0,
+    category_xp: {},
+    category_completed: {},
+    category_skipped: {},
+    completed_count: 0,
+    skipped_count: 0,
     level: 1,
     streak: 0,
     best_streak: 0,
@@ -73,6 +79,11 @@ export async function ensureUserDocument(firebaseUser) {
     name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Player',
     email: firebaseUser.email,
     total_xp: 0,
+    category_xp: {},
+    category_completed: {},
+    category_skipped: {},
+    completed_count: 0,
+    skipped_count: 0,
     level: 1,
     streak: 0,
     best_streak: 0,
@@ -92,6 +103,11 @@ export async function ensureUserDocument(firebaseUser) {
         friend_code: current.friend_code ?? getFriendCode(firebaseUser.uid),
         friend_ids: current.friend_ids ?? [],
         best_streak: current.best_streak ?? current.streak ?? 0,
+        category_xp: current.category_xp ?? {},
+        category_completed: current.category_completed ?? {},
+        category_skipped: current.category_skipped ?? {},
+        completed_count: current.completed_count ?? 0,
+        skipped_count: current.skipped_count ?? 0,
         earned_achievement_ids: current.earned_achievement_ids ?? [],
       },
       { merge: true },
@@ -194,6 +210,10 @@ export async function saveProfile(userId, profile) {
 
 export async function updateUser(userId, patch) {
   return updateDoc(doc(db, 'users', userId), patch)
+}
+
+export function incrementBy(amount) {
+  return increment(amount)
 }
 
 export async function sendFriendRequest({ fromUser, toUser }) {

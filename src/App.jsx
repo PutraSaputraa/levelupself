@@ -13,6 +13,7 @@ import {
   addRecommendationFeedback,
   createDailyMissions,
   ensureUserDocument,
+  incrementBy,
   loginWithFirebase,
   logoutFromFirebase,
   registerWithFirebase,
@@ -32,8 +33,8 @@ import {
   updateDailyMission,
   updateUser,
 } from './lib/firebaseStore'
+import { getXpCategory } from './lib/categoryXp'
 import { getFirebaseErrorMessage } from './lib/firebaseErrors'
-import { getLeaderboard } from './lib/leaderboard'
 import { getLevelFromXp, getLevelProgress } from './lib/leveling'
 import { recommendDailyMissions } from './lib/recommendations'
 import { Achievements } from './pages/Achievements'
@@ -65,7 +66,6 @@ function App() {
   const [actionBusy, setActionBusy] = useState(false)
 
   const progress = getLevelProgress(user?.total_xp ?? 0)
-  const leaderboard = getLeaderboard(users, logs)
   const visiblePage = activePage === 'admin' && user && !user.is_admin ? 'dashboard' : activePage
   const friendIds = useMemo(() => {
     if (!user) return []
@@ -208,6 +208,7 @@ function App() {
     const nextLevel = getLevelFromXp(nextXp)
     const nextStreak = user.last_completed_date === todayKey() ? user.streak : user.streak + 1
     const completedAt = new Date().toISOString()
+    const xpCategory = getXpCategory(mission)
 
     await updateDailyMission(dailyMission.id, {
       status: 'completed',
@@ -224,6 +225,8 @@ function App() {
       rating: null,
       feedback: '',
       duration_actual: mission.duration_minutes,
+      xp_reward: mission.xp_reward,
+      xp_category: xpCategory,
       recommended_score: dailyMission.recommended_score,
       time_completed: completedAt,
       created_at: completedAt,
@@ -231,6 +234,9 @@ function App() {
     await updateUser(user.id, {
       total_xp: nextXp,
       level: nextLevel,
+      [`category_xp.${xpCategory}`]: incrementBy(mission.xp_reward),
+      [`category_completed.${xpCategory}`]: incrementBy(1),
+      completed_count: incrementBy(1),
       streak: nextStreak,
       best_streak: Math.max(user.best_streak ?? 0, nextStreak),
       last_completed_date: todayKey(),
@@ -243,6 +249,7 @@ function App() {
   async function skipMission(dailyMission, reason = '') {
     const mission = missionMap[dailyMission.mission_id]
     const createdAt = new Date().toISOString()
+    const xpCategory = getXpCategory(mission)
 
     await updateDailyMission(dailyMission.id, { status: 'skipped' })
     await addMissionLog({
@@ -256,9 +263,15 @@ function App() {
       rating: null,
       feedback: reason,
       duration_actual: 0,
+      xp_reward: 0,
+      xp_category: xpCategory,
       recommended_score: dailyMission.recommended_score,
       time_completed: null,
       created_at: createdAt,
+    })
+    await updateUser(user.id, {
+      [`category_skipped.${xpCategory}`]: incrementBy(1),
+      skipped_count: incrementBy(1),
     })
   }
 
@@ -266,6 +279,7 @@ function App() {
     const completedAt = new Date().toISOString()
     const nextXp = user.total_xp + eventMission.xp_reward
     const nextLevel = getLevelFromXp(nextXp)
+    const xpCategory = getXpCategory(eventMission)
 
     await addMissionLog({
       user_id: user.id,
@@ -282,6 +296,8 @@ function App() {
       rating: null,
       feedback: '',
       duration_actual: eventMission.duration_minutes,
+      xp_reward: eventMission.xp_reward,
+      xp_category: xpCategory,
       recommended_score: 0,
       time_completed: completedAt,
       created_at: completedAt,
@@ -289,6 +305,9 @@ function App() {
     await updateUser(user.id, {
       total_xp: nextXp,
       level: nextLevel,
+      [`category_xp.${xpCategory}`]: incrementBy(eventMission.xp_reward),
+      [`category_completed.${xpCategory}`]: incrementBy(1),
+      completed_count: incrementBy(1),
     })
 
     if (nextLevel > user.level) setLevelUp(nextLevel)
@@ -400,7 +419,8 @@ function App() {
         <Leaderboard
           currentUserId={user.id}
           friendIds={friendIds}
-          leaderboard={leaderboard}
+          logs={logs}
+          users={users}
         />
       )}
       {visiblePage === 'friends' && (
