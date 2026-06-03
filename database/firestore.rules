@@ -1,0 +1,60 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn();
+      allow create, update: if owns(userId);
+      allow delete: if false;
+    }
+
+    match /user_profiles/{userId} {
+      allow read, create, update: if owns(userId);
+      allow delete: if false;
+    }
+
+    match /daily_missions/{dailyMissionId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+      allow create, update: if signedIn() && request.resource.data.user_id == request.auth.uid;
+      allow delete: if false;
+    }
+
+    match /mission_logs/{logId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    match /recommendation_feedback/{feedbackId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    match /missions/{missionId} {
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.is_admin == true;
+    }
+
+    match /badges/{badgeId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /user_badges/{userBadgeId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}
