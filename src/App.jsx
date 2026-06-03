@@ -18,8 +18,11 @@ import {
   registerWithFirebase,
   saveProfile,
   seedInitialMissionsIfEmpty,
+  respondToFriendRequest,
+  sendFriendRequest,
   subscribeAuth,
   subscribeDailyMissions,
+  subscribeFriendRequests,
   subscribeMissionLogs,
   subscribeMissions,
   subscribeProfile,
@@ -52,6 +55,7 @@ function App() {
   const [profile, setProfile] = useState(null)
   const [missions, setMissions] = useState(initialMissions)
   const [todayMissions, setTodayMissions] = useState([])
+  const [friendRequests, setFriendRequests] = useState([])
   const [logs, setLogs] = useState([])
   const [authMode, setAuthMode] = useState('login')
   const [activePage, setActivePage] = useState('dashboard')
@@ -63,6 +67,17 @@ function App() {
   const progress = getLevelProgress(user?.total_xp ?? 0)
   const leaderboard = getLeaderboard(users, logs)
   const visiblePage = activePage === 'admin' && user && !user.is_admin ? 'dashboard' : activePage
+  const friendIds = useMemo(() => {
+    if (!user) return []
+    const legacyIds = user.friend_ids ?? []
+    const acceptedIds = friendRequests
+      .filter((request) => request.status === 'accepted')
+      .map((request) =>
+        request.from_user_id === user.id ? request.to_user_id : request.from_user_id,
+      )
+
+    return Array.from(new Set([...legacyIds, ...acceptedIds]))
+  }, [friendRequests, user])
   const achievementGroups = useMemo(
     () => (user ? evaluateAchievements({ logs, profile, user }) : []),
     [logs, profile, user],
@@ -84,6 +99,7 @@ function App() {
         setUser(null)
         setProfile(null)
         setTodayMissions([])
+        setFriendRequests([])
         setLogs([])
       }
       if (firebaseUser) await ensureUserDocument(firebaseUser)
@@ -97,6 +113,7 @@ function App() {
       subscribeUser(authUser.uid, setUser),
       subscribeProfile(authUser.uid, setProfile),
       subscribeDailyMissions(authUser.uid, todayKey(), setTodayMissions),
+      subscribeFriendRequests(authUser.uid, setFriendRequests),
       subscribeMissionLogs(authUser.uid, setLogs),
     ]
 
@@ -316,13 +333,22 @@ function App() {
       return
     }
 
-    const friendIds = user.friend_ids ?? []
     if (friendIds.includes(friendId)) return
+    const targetUser = users.find((candidate) => candidate.id === friendId)
+    if (!targetUser) return
 
     try {
-      await updateUser(user.id, { friend_ids: [...friendIds, friendId] })
+      await sendFriendRequest({ fromUser: user, toUser: targetUser })
     } catch (error) {
-      alert(getFirebaseErrorMessage(error, 'Menambah teman'))
+      alert(getFirebaseErrorMessage(error, 'Mengirim friend request'))
+    }
+  }
+
+  async function respondFriendRequest(requestId, status) {
+    try {
+      await respondToFriendRequest(requestId, status)
+    } catch (error) {
+      alert(getFirebaseErrorMessage(error, 'Merespons friend request'))
     }
   }
 
@@ -373,12 +399,19 @@ function App() {
       {visiblePage === 'leaderboard' && (
         <Leaderboard
           currentUserId={user.id}
-          friendIds={user.friend_ids ?? []}
+          friendIds={friendIds}
           leaderboard={leaderboard}
         />
       )}
       {visiblePage === 'friends' && (
-        <Friends onAddFriend={addFriend} user={user} users={users} />
+        <Friends
+          friendIds={friendIds}
+          friendRequests={friendRequests}
+          onAddFriend={addFriend}
+          onRespondRequest={respondFriendRequest}
+          user={user}
+          users={users}
+        />
       )}
       {visiblePage === 'event' && (
         <Event

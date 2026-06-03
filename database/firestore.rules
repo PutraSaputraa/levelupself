@@ -39,6 +39,20 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    match /friend_requests/{requestId} {
+      allow read: if signedIn()
+        && (resource.data.from_user_id == request.auth.uid || resource.data.to_user_id == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.from_user_id == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update: if signedIn()
+        && resource.data.to_user_id == request.auth.uid
+        && request.resource.data.from_user_id == resource.data.from_user_id
+        && request.resource.data.to_user_id == resource.data.to_user_id
+        && request.resource.data.status in ['accepted', 'declined'];
+      allow delete: if false;
+    }
+
     match /missions/{missionId} {
       allow read: if signedIn();
       allow create, update, delete: if signedIn()

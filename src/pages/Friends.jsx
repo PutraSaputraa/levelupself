@@ -1,10 +1,22 @@
 import { useMemo, useState } from 'react'
 
-export function Friends({ onAddFriend, user, users }) {
+export function Friends({
+  friendIds,
+  friendRequests,
+  onAddFriend,
+  onRespondRequest,
+  user,
+  users,
+}) {
   const [query, setQuery] = useState('')
   const [submittedQuery, setSubmittedQuery] = useState('')
-  const friendIds = user.friend_ids ?? []
   const friends = users.filter((candidate) => friendIds.includes(candidate.id))
+  const incomingRequests = friendRequests.filter(
+    (request) => request.to_user_id === user.id && request.status === 'pending',
+  )
+  const outgoingRequests = friendRequests.filter(
+    (request) => request.from_user_id === user.id && request.status === 'pending',
+  )
   const suggestions = useMemo(() => {
     const term = submittedQuery.trim().toLowerCase()
     if (!term) return []
@@ -66,6 +78,12 @@ export function Friends({ onAddFriend, user, users }) {
           {submittedQuery && suggestions.length === 0 && <p>User belum ditemukan.</p>}
           {suggestions.map((candidate) => {
             const alreadyFriend = friendIds.includes(candidate.id)
+            const hasPendingRequest = friendRequests.some(
+              (request) =>
+                request.status === 'pending' &&
+                ((request.from_user_id === user.id && request.to_user_id === candidate.id) ||
+                  (request.from_user_id === candidate.id && request.to_user_id === user.id)),
+            )
 
             return (
               <div className="friend-row" key={candidate.id}>
@@ -74,16 +92,67 @@ export function Friends({ onAddFriend, user, users }) {
                   <span>{candidate.friend_code}</span>
                 </div>
                 <button
-                  className={alreadyFriend ? 'ghost' : 'primary'}
-                  disabled={alreadyFriend}
+                  className={alreadyFriend || hasPendingRequest ? 'ghost' : 'primary'}
+                  disabled={alreadyFriend || hasPendingRequest}
                   onClick={() => onAddFriend(candidate.id)}
                   type="button"
                 >
-                  {alreadyFriend ? 'Sudah teman' : 'Tambah'}
+                  {alreadyFriend ? 'Sudah teman' : hasPendingRequest ? 'Menunggu' : 'Request'}
                 </button>
               </div>
             )
           })}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">Friend request</span>
+            <h2>Request masuk</h2>
+          </div>
+          <span className="date-chip">{incomingRequests.length} pending</span>
+        </div>
+        <div className="friend-list">
+          {incomingRequests.length === 0 && <p>Tidak ada request masuk.</p>}
+          {incomingRequests.map((request) => (
+            <div className="friend-row" key={request.id}>
+              <div className="player-cell">
+                <strong>{request.from_name}</strong>
+                <span>{request.from_friend_code}</span>
+              </div>
+              <div className="friend-actions">
+                <button className="ghost" onClick={() => onRespondRequest(request.id, 'declined')} type="button">
+                  Tolak
+                </button>
+                <button className="primary" onClick={() => onRespondRequest(request.id, 'accepted')} type="button">
+                  Terima
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="section-head">
+          <div>
+            <span className="eyebrow">Sent request</span>
+            <h2>Request terkirim</h2>
+          </div>
+          <span className="date-chip">{outgoingRequests.length} pending</span>
+        </div>
+        <div className="friend-list">
+          {outgoingRequests.length === 0 && <p>Belum ada request terkirim.</p>}
+          {outgoingRequests.map((request) => (
+            <div className="friend-row" key={request.id}>
+              <div className="player-cell">
+                <strong>{request.to_name}</strong>
+                <span>{request.to_friend_code}</span>
+              </div>
+              <span className="status-chip">pending</span>
+            </div>
+          ))}
         </div>
       </section>
 

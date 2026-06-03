@@ -707,6 +707,15 @@ button:disabled {
   min-width: 108px;
 }
 
+.friend-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.friend-actions button {
+  min-width: 96px;
+}
+
 .friend-search-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 118px;
@@ -1221,6 +1230,14 @@ button:disabled {
   .profile-hero {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .friend-actions {
+    width: 100%;
+  }
+
+  .friend-actions button {
+    flex: 1;
   }
 
   .profile-stats {

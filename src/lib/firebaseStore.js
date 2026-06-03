@@ -155,12 +155,86 @@ export function subscribeMissionLogs(userId, callback) {
   })
 }
 
+export function subscribeFriendRequests(userId, callback) {
+  const incomingQuery = query(collection(db, 'friend_requests'), where('to_user_id', '==', userId))
+  const outgoingQuery = query(collection(db, 'friend_requests'), where('from_user_id', '==', userId))
+  const requests = new Map()
+
+  function emit() {
+    callback(
+      Array.from(requests.values()).sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at),
+      ),
+    )
+  }
+
+  const unsubscribeIncoming = onSnapshot(incomingQuery, (snapshot) => {
+    snapshot.docs.forEach((requestDoc) => {
+      requests.set(requestDoc.id, { id: requestDoc.id, ...requestDoc.data() })
+    })
+    emit()
+  })
+
+  const unsubscribeOutgoing = onSnapshot(outgoingQuery, (snapshot) => {
+    snapshot.docs.forEach((requestDoc) => {
+      requests.set(requestDoc.id, { id: requestDoc.id, ...requestDoc.data() })
+    })
+    emit()
+  })
+
+  return () => {
+    unsubscribeIncoming()
+    unsubscribeOutgoing()
+  }
+}
+
 export async function saveProfile(userId, profile) {
   return setDoc(doc(db, 'user_profiles', userId), profile, { merge: true })
 }
 
 export async function updateUser(userId, patch) {
   return updateDoc(doc(db, 'users', userId), patch)
+}
+
+export async function sendFriendRequest({ fromUser, toUser }) {
+  const existing = await getDocs(
+    query(
+      collection(db, 'friend_requests'),
+      where('from_user_id', '==', fromUser.id),
+      where('to_user_id', '==', toUser.id),
+      limit(1),
+    ),
+  )
+  if (!existing.empty) return
+
+  const reverseExisting = await getDocs(
+    query(
+      collection(db, 'friend_requests'),
+      where('from_user_id', '==', toUser.id),
+      where('to_user_id', '==', fromUser.id),
+      limit(1),
+    ),
+  )
+  if (!reverseExisting.empty) return
+
+  return addDoc(collection(db, 'friend_requests'), {
+    from_user_id: fromUser.id,
+    from_name: fromUser.name,
+    from_friend_code: fromUser.friend_code,
+    to_user_id: toUser.id,
+    to_name: toUser.name,
+    to_friend_code: toUser.friend_code,
+    status: 'pending',
+    created_at: new Date().toISOString(),
+    responded_at: null,
+  })
+}
+
+export async function respondToFriendRequest(requestId, status) {
+  return updateDoc(doc(db, 'friend_requests', requestId), {
+    status,
+    responded_at: new Date().toISOString(),
+  })
 }
 
 export async function createDailyMissions(userId, missions) {
