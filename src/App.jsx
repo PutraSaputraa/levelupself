@@ -114,6 +114,16 @@ function App() {
   }, [user?.is_admin])
 
   useEffect(() => {
+    if (!user) return
+    const computedLevel = getLevelFromXp(user.total_xp)
+    if (user.level === computedLevel) return
+
+    updateUser(user.id, { level: computedLevel }).catch((error) => {
+      console.warn('Level sync skipped:', error.message)
+    })
+  }, [user])
+
+  useEffect(() => {
     if (!authUser || !profile?.onboarding_completed || todayMissions.length > 0) return
 
     const recommended = recommendDailyMissions({

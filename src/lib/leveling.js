@@ -1,10 +1,17 @@
+export function xpToNextLevel(level) {
+  if (level <= 1) return 100
+  return 100 + (level - 1) * 50 + Math.max(0, level - 2) ** 2 * 25
+}
+
 export function xpForLevel(level) {
   if (level <= 1) return 0
-  if (level === 2) return 100
-  if (level === 3) return 250
-  if (level === 4) return 500
-  if (level === 5) return 900
-  return level * level * 100
+
+  let total = 0
+  for (let currentLevel = 1; currentLevel < level; currentLevel += 1) {
+    total += xpToNextLevel(currentLevel)
+  }
+
+  return total
 }
 
 export function getLevelFromXp(totalXp) {
