@@ -1108,7 +1108,11 @@ button:disabled {
       var(--hold-progress) 100% no-repeat,
     rgba(2, 6, 23, 0.64);
   font-weight: 900;
+  cursor: pointer;
   touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
 }
 
 .hold-button span {

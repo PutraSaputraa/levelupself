@@ -7,6 +7,7 @@ export function MissionActionModal({ action, mission, onCancel, onConfirm, pendi
   const [reason, setReason] = useState('')
   const frameRef = useRef(null)
   const startedAtRef = useRef(null)
+  const completedRef = useRef(false)
 
   const isComplete = action === 'complete'
   const title = isComplete ? 'Tamatkan misi ini' : 'Lewati misi ini'
@@ -21,16 +22,18 @@ export function MissionActionModal({ action, mission, onCancel, onConfirm, pendi
     if (frameRef.current) cancelAnimationFrame(frameRef.current)
     frameRef.current = null
     startedAtRef.current = null
-    setProgress(0)
+    if (!completedRef.current) setProgress(0)
   }
 
   function tick() {
+    if (!startedAtRef.current) return
     const elapsed = performance.now() - startedAtRef.current
     const nextProgress = Math.min(100, Math.round((elapsed / HOLD_MS) * 100))
     setProgress(nextProgress)
 
     if (nextProgress >= 100) {
       frameRef.current = null
+      completedRef.current = true
       onConfirm(reason)
       return
     }
@@ -38,10 +41,20 @@ export function MissionActionModal({ action, mission, onCancel, onConfirm, pendi
     frameRef.current = requestAnimationFrame(tick)
   }
 
-  function startHold() {
+  function startHold(event) {
     if (pending || frameRef.current) return
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+    completedRef.current = false
     startedAtRef.current = performance.now()
+    setProgress(1)
     frameRef.current = requestAnimationFrame(tick)
+  }
+
+  function stopHold(event) {
+    if (event?.currentTarget?.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+    cancelHold()
   }
 
   return (
@@ -76,10 +89,9 @@ export function MissionActionModal({ action, mission, onCancel, onConfirm, pendi
         <button
           className="hold-button"
           disabled={pending}
-          onPointerCancel={cancelHold}
+          onPointerCancel={stopHold}
           onPointerDown={startHold}
-          onPointerLeave={cancelHold}
-          onPointerUp={cancelHold}
+          onPointerUp={stopHold}
           style={{ '--hold-progress': `${progress}%` }}
           type="button"
         >
