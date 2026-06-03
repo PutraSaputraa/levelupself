@@ -34,9 +34,10 @@ import { getLevelFromXp, getLevelProgress } from './lib/leveling'
 import { recommendDailyMissions } from './lib/recommendations'
 import { Admin } from './pages/Admin'
 import { Dashboard } from './pages/Dashboard'
+import { Event } from './pages/Event'
+import { Friends } from './pages/Friends'
 import { Landing } from './pages/Landing'
 import { Leaderboard } from './pages/Leaderboard'
-import { MissionDetail } from './pages/MissionDetail'
 import { Onboarding } from './pages/Onboarding'
 import { Profile } from './pages/Profile'
 import { Progress } from './pages/Progress'
@@ -52,7 +53,6 @@ function App() {
   const [logs, setLogs] = useState([])
   const [authMode, setAuthMode] = useState('login')
   const [activePage, setActivePage] = useState('dashboard')
-  const [selectedMission, setSelectedMission] = useState(null)
   const [levelUp, setLevelUp] = useState(null)
   const [feedbackMission, setFeedbackMission] = useState(null)
   const [pendingAction, setPendingAction] = useState(null)
@@ -194,6 +194,7 @@ function App() {
       total_xp: nextXp,
       level: nextLevel,
       streak: nextStreak,
+      best_streak: Math.max(user.best_streak ?? 0, nextStreak),
       last_completed_date: todayKey(),
     })
 
@@ -262,6 +263,22 @@ function App() {
     }
   }
 
+  async function addFriend(friendId) {
+    if (friendId === user.id) {
+      alert('Kamu tidak bisa menambahkan diri sendiri.')
+      return
+    }
+
+    const friendIds = user.friend_ids ?? []
+    if (friendIds.includes(friendId)) return
+
+    try {
+      await updateUser(user.id, { friend_ids: [...friendIds, friendId] })
+    } catch (error) {
+      alert(getFirebaseErrorMessage(error, 'Menambah teman'))
+    }
+  }
+
   if (!authReady) {
     return <main className="loading-screen">Menghubungkan ke Firebase...</main>
   }
@@ -299,35 +316,33 @@ function App() {
           dailyMissions={todayMissions}
           missionMap={missionMap}
           onComplete={(dailyMission) => requestMissionAction('complete', dailyMission)}
-          onSelect={(mission) => {
-            setSelectedMission(mission)
-            setActivePage('missions')
-          }}
           onSkip={(dailyMission) => requestMissionAction('skip', dailyMission)}
           progress={progress}
           user={user}
           userLogs={logs}
         />
       )}
-      {visiblePage === 'missions' && (
-        <MissionDetail
-          dailyMissions={todayMissions}
-          missionMap={missionMap}
-          onComplete={(dailyMission) => requestMissionAction('complete', dailyMission)}
-          onSelect={setSelectedMission}
-          onSkip={(dailyMission) => requestMissionAction('skip', dailyMission)}
-          selectedMission={selectedMission}
-        />
-      )}
       {visiblePage === 'progress' && <Progress user={user} userLogs={logs} />}
       {visiblePage === 'leaderboard' && (
-        <Leaderboard currentUserId={user.id} leaderboard={leaderboard} />
+        <Leaderboard
+          currentUserId={user.id}
+          friendIds={user.friend_ids ?? []}
+          leaderboard={leaderboard}
+        />
+      )}
+      {visiblePage === 'friends' && (
+        <Friends onAddFriend={addFriend} user={user} users={users} />
+      )}
+      {visiblePage === 'event' && (
+        <Event />
       )}
       {visiblePage === 'profile' && (
         <Profile
+          badges={earnedBadges()}
           onSave={(nextProfile) => saveProfile(user.id, nextProfile)}
           profile={profile}
           user={user}
+          userLogs={logs}
         />
       )}
       {visiblePage === 'admin' && (

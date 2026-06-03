@@ -1,7 +1,6 @@
 # LevelUp Self Firestore Schema
 
-This app currently runs as a local-first prototype and is prepared to sync these
-collections to Firebase Auth and Cloud Firestore.
+The app uses Firebase Auth and these Cloud Firestore collections.
 
 ## Collections
 
@@ -12,6 +11,9 @@ collections to Firebase Auth and Cloud Firestore.
 - total_xp: number
 - level: number
 - streak: number
+- best_streak: number
+- friend_code: string
+- friend_ids: string[]
 - is_admin: boolean
 - last_completed_date: string
 - created_at: timestamp

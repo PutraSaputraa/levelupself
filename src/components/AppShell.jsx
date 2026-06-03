@@ -2,9 +2,10 @@ import { classNames } from '../lib/classNames'
 
 const navItems = [
   ['dashboard', 'Dashboard'],
-  ['missions', 'Mission Detail'],
   ['progress', 'Progress'],
   ['leaderboard', 'Leaderboard'],
+  ['friends', 'Friends'],
+  ['event', 'Event'],
   ['profile', 'Profile'],
 ]
 

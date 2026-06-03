@@ -130,6 +130,7 @@ button:disabled {
 .panel,
 .auth-card,
 .mission-card,
+.podium-card,
 .modal {
   border: 1px solid rgba(148, 163, 184, 0.18);
   background: rgba(15, 23, 42, 0.82);
@@ -418,6 +419,10 @@ button:disabled {
   gap: 14px;
 }
 
+.compact-podium {
+  margin-bottom: 14px;
+}
+
 .podium-card {
   position: relative;
   display: grid;
@@ -425,6 +430,8 @@ button:disabled {
   overflow: hidden;
   align-content: space-between;
   isolation: isolate;
+  border-radius: 8px;
+  padding: 20px;
 }
 
 .podium-card::before {
@@ -488,6 +495,13 @@ button:disabled {
   background: rgba(2, 6, 23, 0.45);
   font-size: 20px;
   font-weight: 900;
+}
+
+.player-avatar.small {
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  font-size: 14px;
 }
 
 .podium-body h2 {
@@ -663,7 +677,9 @@ button:disabled {
 .mini-list,
 .category-list,
 .mission-table,
-.leaderboard-list {
+.leaderboard-list,
+.friend-search-list,
+.friend-list {
   display: grid;
   gap: 10px;
 }
@@ -672,11 +688,103 @@ button:disabled {
 .admin-row,
 .category-list div,
 .mini-list button,
-.leaderboard-row {
+.leaderboard-row,
+.friend-row {
   padding: 12px;
   border: 1px solid rgba(148, 163, 184, 0.14);
   border-radius: 8px;
   background: rgba(2, 6, 23, 0.36);
+}
+
+.friend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.friend-row button {
+  min-width: 108px;
+}
+
+.copy-pill {
+  border: 1px solid rgba(110, 231, 183, 0.36);
+  cursor: pointer;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 18px;
+}
+
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.profile-avatar {
+  width: 86px;
+  height: 86px;
+  margin: 0;
+  font-size: 28px;
+}
+
+.profile-hero h2 {
+  margin-bottom: 6px;
+}
+
+.profile-hero p,
+.event-panel p,
+.friend-search-list p,
+.friend-list p,
+.profile-badges p {
+  color: #aab8cf;
+  margin: 0;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.profile-stats div {
+  padding: 14px;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.42);
+}
+
+.profile-stats span,
+.profile-stats strong {
+  display: block;
+}
+
+.profile-stats span {
+  color: #8ea2bf;
+  font-size: 12px;
+}
+
+.profile-stats strong {
+  margin-top: 4px;
+  color: #f8fafc;
+  font-size: 22px;
+}
+
+.profile-badges {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.event-panel {
+  min-height: 360px;
+  display: grid;
+  align-content: center;
+  gap: 12px;
+}
+
+.event-panel h2 {
+  font-size: clamp(26px, 4vw, 44px);
 }
 
 .leaderboard-row {
@@ -900,6 +1008,7 @@ button:disabled {
   .dashboard-grid,
   .detail-layout,
   .admin-layout,
+  .profile-grid,
   .podium-grid,
   .survey-grid,
   .survey-grid.compact {
@@ -930,6 +1039,10 @@ button:disabled {
   .leaderboard-row div:nth-child(n + 5) {
     display: none;
   }
+
+  .profile-badges {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -952,8 +1065,14 @@ button:disabled {
   .topbar,
   .section-head,
   .history-row,
-  .admin-row {
+  .admin-row,
+  .friend-row,
+  .profile-hero {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .profile-stats {
+    grid-template-columns: 1fr;
   }
 }

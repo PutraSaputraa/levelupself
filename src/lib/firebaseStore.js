@@ -23,6 +23,10 @@ import { emptyProfile } from '../data/appData'
 import { initialMissions } from '../data/missions'
 import { auth, db } from './firebase'
 
+function getFriendCode(userId) {
+  return `LUS-${userId.slice(0, 8).toUpperCase()}`
+}
+
 export function subscribeAuth(callback) {
   return onAuthStateChanged(auth, callback)
 }
@@ -38,7 +42,10 @@ export async function registerWithFirebase({ email, name, password }) {
     total_xp: 0,
     level: 1,
     streak: 0,
+    best_streak: 0,
     is_admin: email.includes('admin'),
+    friend_code: getFriendCode(credential.user.uid),
+    friend_ids: [],
     created_at: new Date().toISOString(),
   }
 
@@ -67,11 +74,26 @@ export async function ensureUserDocument(firebaseUser) {
     total_xp: 0,
     level: 1,
     streak: 0,
+    best_streak: 0,
     is_admin: firebaseUser.email?.includes('admin') ?? false,
+    friend_code: getFriendCode(firebaseUser.uid),
+    friend_ids: [],
     created_at: new Date().toISOString(),
   }
 
   if (!userSnapshot.exists()) await setDoc(userRef, user)
+  if (userSnapshot.exists()) {
+    const current = userSnapshot.data()
+    await setDoc(
+      userRef,
+      {
+        friend_code: current.friend_code ?? getFriendCode(firebaseUser.uid),
+        friend_ids: current.friend_ids ?? [],
+        best_streak: current.best_streak ?? current.streak ?? 0,
+      },
+      { merge: true },
+    )
+  }
   if (!profileSnapshot.exists()) await setDoc(profileRef, emptyProfile)
 }
 

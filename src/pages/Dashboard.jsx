@@ -9,7 +9,6 @@ export function Dashboard({
   dailyMissions,
   missionMap,
   onComplete,
-  onSelect,
   onSkip,
   progress,
   user,
@@ -88,7 +87,6 @@ export function Dashboard({
               key={daily.id}
               mission={missionMap[daily.mission_id]}
               onComplete={() => onComplete(daily)}
-              onSelect={() => onSelect(missionMap[daily.mission_id])}
               onSkip={() => onSkip(daily)}
             />
           ))}

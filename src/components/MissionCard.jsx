@@ -1,6 +1,6 @@
 import { classNames } from '../lib/classNames'
 
-export function MissionCard({ daily, mission, onComplete, onSelect, onSkip }) {
+export function MissionCard({ daily, mission, onComplete, onSkip }) {
   return (
     <article className={classNames('mission-card', daily.status)}>
       <div className="mission-meta">
@@ -16,9 +16,6 @@ export function MissionCard({ daily, mission, onComplete, onSelect, onSkip }) {
         ))}
       </div>
       <div className="card-actions">
-        <button className="ghost" onClick={onSelect} type="button">
-          Detail
-        </button>
         {daily.status === 'pending' ? (
           <>
             <button className="ghost" onClick={onSkip} type="button">
