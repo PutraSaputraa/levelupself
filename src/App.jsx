@@ -3,6 +3,7 @@ import './App.css'
 import { AppShell } from './components/AppShell'
 import { FeedbackModal } from './components/FeedbackModal'
 import { LevelUpModal } from './components/LevelUpModal'
+import { MissionActionModal } from './components/MissionActionModal'
 import { emptyProfile, badgeRules } from './data/appData'
 import { initialMissions } from './data/missions'
 import { todayKey } from './lib/date'
@@ -54,6 +55,8 @@ function App() {
   const [selectedMission, setSelectedMission] = useState(null)
   const [levelUp, setLevelUp] = useState(null)
   const [feedbackMission, setFeedbackMission] = useState(null)
+  const [pendingAction, setPendingAction] = useState(null)
+  const [actionBusy, setActionBusy] = useState(false)
 
   const progress = getLevelProgress(user?.total_xp ?? 0)
   const leaderboard = getLeaderboard(users, logs)
@@ -156,6 +159,10 @@ function App() {
     await saveProfile(authUser.uid, { ...nextProfile, onboarding_completed: true })
   }
 
+  function requestMissionAction(action, dailyMission) {
+    setPendingAction({ action, dailyMission })
+  }
+
   async function completeMission(dailyMission) {
     const mission = missionMap[dailyMission.mission_id]
     const nextXp = user.total_xp + mission.xp_reward
@@ -193,9 +200,8 @@ function App() {
     if (nextLevel > user.level) setLevelUp(nextLevel)
   }
 
-  async function skipMission(dailyMission) {
+  async function skipMission(dailyMission, reason = '') {
     const mission = missionMap[dailyMission.mission_id]
-    const reason = window.prompt('Alasan skip? Contoh: terlalu sulit, tidak sempat, membosankan.')
     const createdAt = new Date().toISOString()
 
     await updateDailyMission(dailyMission.id, { status: 'skipped' })
@@ -208,12 +214,30 @@ function App() {
       completed: false,
       skipped: true,
       rating: null,
-      feedback: reason ?? '',
+      feedback: reason,
       duration_actual: 0,
       recommended_score: dailyMission.recommended_score,
       time_completed: null,
       created_at: createdAt,
     })
+  }
+
+  async function confirmMissionAction(reason) {
+    if (!pendingAction) return
+    setActionBusy(true)
+
+    try {
+      if (pendingAction.action === 'complete') {
+        await completeMission(pendingAction.dailyMission)
+      } else {
+        await skipMission(pendingAction.dailyMission, reason)
+      }
+      setPendingAction(null)
+    } catch (error) {
+      alert(getFirebaseErrorMessage(error, 'Memproses misi'))
+    } finally {
+      setActionBusy(false)
+    }
   }
 
   function earnedBadges() {
@@ -272,12 +296,12 @@ function App() {
           badges={earnedBadges()}
           dailyMissions={todayMissions}
           missionMap={missionMap}
-          onComplete={completeMission}
+          onComplete={(dailyMission) => requestMissionAction('complete', dailyMission)}
           onSelect={(mission) => {
             setSelectedMission(mission)
             setActivePage('missions')
           }}
-          onSkip={skipMission}
+          onSkip={(dailyMission) => requestMissionAction('skip', dailyMission)}
           progress={progress}
           user={user}
           userLogs={logs}
@@ -287,9 +311,9 @@ function App() {
         <MissionDetail
           dailyMissions={todayMissions}
           missionMap={missionMap}
-          onComplete={completeMission}
+          onComplete={(dailyMission) => requestMissionAction('complete', dailyMission)}
           onSelect={setSelectedMission}
-          onSkip={skipMission}
+          onSkip={(dailyMission) => requestMissionAction('skip', dailyMission)}
           selectedMission={selectedMission}
         />
       )}
@@ -321,6 +345,15 @@ function App() {
             })
             setFeedbackMission(null)
           }}
+        />
+      )}
+      {pendingAction && (
+        <MissionActionModal
+          action={pendingAction.action}
+          mission={missionMap[pendingAction.dailyMission.mission_id]}
+          onCancel={() => setPendingAction(null)}
+          onConfirm={confirmMissionAction}
+          pending={actionBusy}
         />
       )}
     </AppShell>

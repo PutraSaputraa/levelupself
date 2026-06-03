@@ -17,15 +17,30 @@ export function Leaderboard({ currentUserId, leaderboard }) {
       <section className="podium-grid">
         {topThree.map((player) => (
           <article
-            className={classNames('panel podium-card', player.id === currentUserId && 'current')}
+            className={classNames(
+              'panel podium-card',
+              `rank-${player.rank}`,
+              player.id === currentUserId && 'current',
+            )}
             key={player.id}
           >
-            <span className="rank-medal">#{player.rank}</span>
-            <h2>{player.name}</h2>
-            <strong>{player.score} pts</strong>
-            <span>
-              {player.total_xp} XP - streak {player.streak} hari
-            </span>
+            <div className="podium-head">
+              <span className="rank-medal">#{player.rank}</span>
+              <span className="podium-label">
+                {player.rank === 1 ? 'Top Player' : `Challenger ${player.rank}`}
+              </span>
+            </div>
+            <div className="player-avatar">{player.name.slice(0, 2).toUpperCase()}</div>
+            <div className="podium-body">
+              <h2>{player.name}</h2>
+              <strong>{player.score} pts</strong>
+              <span>
+                {player.total_xp} XP - streak {player.streak} hari
+              </span>
+            </div>
+            <div className="podium-meter">
+              <div style={{ width: `${Math.min(100, player.completionRate || 12)}%` }} />
+            </div>
           </article>
         ))}
       </section>
