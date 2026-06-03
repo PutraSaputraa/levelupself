@@ -6,6 +6,7 @@ const navItems = [
   ['leaderboard', 'Leaderboard'],
   ['friends', 'Friends'],
   ['event', 'Event'],
+  ['achievements', 'Achievement'],
   ['profile', 'Profile'],
 ]
 

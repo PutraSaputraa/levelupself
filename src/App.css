@@ -754,8 +754,7 @@ button:disabled {
 .event-panel p,
 .friend-search-list p,
 .friend-list p,
-.badges p,
-.achievement-list p {
+.badges p {
   color: #aab8cf;
   margin: 0;
 }
@@ -797,24 +796,46 @@ button:disabled {
   font-size: clamp(24px, 3vw, 34px);
 }
 
-.event-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+.event-category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
 
-.event-tabs button {
-  min-height: 40px;
+.event-category-card {
+  display: grid;
+  min-height: 230px;
+  align-content: space-between;
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 8px;
-  padding: 0 14px;
+  padding: 22px;
   color: #dbeafe;
-  background: rgba(2, 6, 23, 0.42);
+  background: rgba(15, 23, 42, 0.82);
+  text-align: left;
 }
 
-.event-tabs button.selected {
-  color: #04111f;
-  background: #6ee7b7;
+.event-category-card h2 {
+  margin: 14px 0 8px;
+  color: #f8fafc;
+  font-size: 30px;
+}
+
+.event-category-card p {
+  color: #aab8cf;
+  margin: 0;
+}
+
+.event-category-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  color: #a7f3d0;
+}
+
+.event-category-footer span,
+.event-category-footer strong {
+  display: block;
 }
 
 .event-mission-grid {
@@ -847,47 +868,63 @@ button:disabled {
   flex: 1;
 }
 
-.achievement-groups {
-  display: grid;
-  gap: 18px;
-}
-
-.achievement-group h3 {
-  margin: 0 0 10px;
-  color: #f8fafc;
-}
-
-.achievement-list {
-  display: grid;
-  gap: 8px;
-}
-
-.achievement-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 16px;
-  align-items: center;
-  padding: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.14);
+.event-progress-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
   border-radius: 8px;
-  opacity: 0.58;
-  background: rgba(2, 6, 23, 0.34);
+  color: #bfdbfe;
+  background: rgba(59, 130, 246, 0.12);
 }
 
-.achievement-row.earned {
-  opacity: 1;
+.achievement-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.achievement-card {
+  display: grid;
+  min-height: 150px;
+  align-content: space-between;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 8px;
+  padding: 16px;
+  color: #dbeafe;
+  background: rgba(2, 6, 23, 0.36);
+  text-align: left;
+}
+
+.achievement-card.earned {
   border-color: rgba(110, 231, 183, 0.5);
   background: rgba(34, 197, 94, 0.1);
 }
 
-.achievement-row strong,
-.achievement-row span {
+.achievement-card strong,
+.achievement-card small {
   display: block;
 }
 
-.achievement-row span {
+.achievement-card small {
   color: #8ea2bf;
-  font-size: 13px;
+}
+
+.achievement-icon {
+  display: inline-grid;
+  width: fit-content;
+  min-height: 28px;
+  place-items: center;
+  border-radius: 8px;
+  padding: 0 10px;
+  color: #04111f;
+  background: #6ee7b7;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.achievement-modal h2 {
+  color: #f8fafc;
 }
 
 .achievement-reward {
@@ -1117,6 +1154,7 @@ button:disabled {
   .detail-layout,
   .admin-layout,
   .profile-grid,
+  .event-category-grid,
   .podium-grid,
   .survey-grid,
   .survey-grid.compact {
@@ -1142,6 +1180,10 @@ button:disabled {
 
   .event-mission-grid {
     grid-template-columns: 1fr;
+  }
+
+  .achievement-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .leaderboard-row {
@@ -1185,11 +1227,11 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
-  .achievement-row {
+  .friend-search-form {
     grid-template-columns: 1fr;
   }
 
-  .friend-search-form {
+  .achievement-card-grid {
     grid-template-columns: 1fr;
   }
 }

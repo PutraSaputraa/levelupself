@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { ChoiceGroup } from '../components/ChoiceGroup'
 import { surveyOptions } from '../data/appData'
-import { classNames } from '../lib/classNames'
 
-export function Profile({ achievementGroups, badges, onSave, profile, user, userLogs }) {
+export function Profile({ onSave, profile, user, userLogs }) {
   const [draft, setDraft] = useState(profile)
   const completed = userLogs.filter((log) => log.status === 'completed').length
 
@@ -56,34 +55,6 @@ export function Profile({ achievementGroups, badges, onSave, profile, user, user
               <strong>{completed}</strong>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="panel">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">Achievements</span>
-            <h2>Achievement</h2>
-          </div>
-          <span className="date-chip">{badges.length} terbuka</span>
-        </div>
-        <div className="achievement-groups">
-          {achievementGroups.map((group) => (
-            <div className="achievement-group" key={group.id}>
-              <h3>{group.title}</h3>
-              <div className="achievement-list">
-                {group.items.map((item) => (
-                  <div className={classNames('achievement-row', item.earned && 'earned')} key={item.id}>
-                    <div>
-                      <strong>{item.name}</strong>
-                      <span>{item.description}</span>
-                    </div>
-                    <span className="achievement-reward">{item.reward}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 

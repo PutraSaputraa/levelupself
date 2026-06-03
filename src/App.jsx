@@ -33,6 +33,7 @@ import { getFirebaseErrorMessage } from './lib/firebaseErrors'
 import { getLeaderboard } from './lib/leaderboard'
 import { getLevelFromXp, getLevelProgress } from './lib/leveling'
 import { recommendDailyMissions } from './lib/recommendations'
+import { Achievements } from './pages/Achievements'
 import { Admin } from './pages/Admin'
 import { Dashboard } from './pages/Dashboard'
 import { Event } from './pages/Event'
@@ -126,28 +127,6 @@ function App() {
       alert(getFirebaseErrorMessage(error, 'Membuat misi harian'))
     })
   }, [authUser, logs, missions, profile, todayMissions.length])
-
-  useEffect(() => {
-    if (!user || earnedAchievements.length === 0) return
-
-    const claimed = user.earned_achievement_ids ?? []
-    const newlyEarned = earnedAchievements.filter((achievement) => !claimed.includes(achievement.id))
-    if (newlyEarned.length === 0) return
-
-    const bonusXp = newlyEarned.reduce((total, achievement) => {
-      const match = achievement.reward.match(/(\d+)/)
-      return total + (match ? Number(match[1]) : 0)
-    }, 0)
-    const nextXp = user.total_xp + bonusXp
-
-    updateUser(user.id, {
-      earned_achievement_ids: [...claimed, ...newlyEarned.map((achievement) => achievement.id)],
-      total_xp: nextXp,
-      level: getLevelFromXp(nextXp),
-    }).catch((error) => {
-      console.warn('Achievement reward skipped:', error.message)
-    })
-  }, [earnedAchievements, user])
 
   async function register(form) {
     const data = new FormData(form)
@@ -268,6 +247,8 @@ function App() {
       category: eventMission.category,
       source: 'event',
       event_category: eventMission.event_category,
+      metric_type: eventMission.metric_type,
+      metric_value: eventMission.metric_value,
       status: 'completed',
       completed: true,
       skipped: false,
@@ -391,18 +372,17 @@ function App() {
       )}
       {visiblePage === 'event' && (
         <Event
-          completedEventIds={logs
-            .filter((log) => log.source === 'event' && log.status === 'completed')
-            .map((log) => log.mission_id)}
+          eventLogs={logs.filter((log) => log.source === 'event' && log.status === 'completed')}
           onComplete={(eventMission) =>
             requestMissionAction('complete', { mission_id: eventMission.id }, 'event', eventMission)
           }
         />
       )}
+      {visiblePage === 'achievements' && (
+        <Achievements achievementGroups={achievementGroups} earnedCount={earnedAchievements.length} />
+      )}
       {visiblePage === 'profile' && (
         <Profile
-          achievementGroups={achievementGroups}
-          badges={earnedAchievements}
           onSave={(nextProfile) => saveProfile(user.id, nextProfile)}
           profile={profile}
           user={user}

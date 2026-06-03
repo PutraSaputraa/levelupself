@@ -26,6 +26,12 @@ function hasTitle(logs, text) {
   return completedLogs(logs).some((log) => log.title?.toLowerCase().includes(text))
 }
 
+function metricTotal(logs, type) {
+  return completedLogs(logs)
+    .filter((log) => log.metric_type === type)
+    .reduce((total, log) => total + Number(log.metric_value ?? 0), 0)
+}
+
 function achievementChecks({ logs, profile, user }) {
   const completed = completedLogs(logs)
   const skipped = logs.filter((log) => log.status === 'skipped')
@@ -33,7 +39,12 @@ function achievementChecks({ logs, profile, user }) {
   const readingCount = countBy(logs, (log) => readingCategories.has(log.category))
   const mindfulnessCount = countBy(logs, (log) => mindfulnessCategories.has(log.category))
   const productivityCount = countBy(logs, (log) => productivityCategories.has(log.category))
-  const meditationCount = countBy(logs, (log) => log.title?.toLowerCase().includes('meditasi'))
+  const pushUpTotal = metricTotal(logs, 'push_up')
+  const readingMinutes = metricTotal(logs, 'reading_minutes')
+  const focusMinutes = metricTotal(logs, 'focus_minutes')
+  const cardioMinutes = metricTotal(logs, 'cardio_minutes')
+  const meditationMissions =
+    metricTotal(logs, 'meditation_mission') + countBy(logs, (log) => log.title?.toLowerCase().includes('meditasi'))
 
   return {
     'first-step': completed.length >= 1,
@@ -52,28 +63,31 @@ function achievementChecks({ logs, profile, user }) {
     'never-too-late': false,
     'fresh-start': skipped.length >= 1 && completed.length >= 1,
     'mini-athlete': fitnessCount >= 5,
-    'push-up-starter': countBy(logs, (log) => log.title?.toLowerCase().includes('push up')) >= 5,
+    'push-up-starter': pushUpTotal >= 50,
     walker: countBy(logs, (log) => log.title?.toLowerCase().includes('jalan')) >= 5,
-    'runner-seed': hasTitle(logs, 'lari'),
+    'runner-seed': hasTitle(logs, 'lari') || metricTotal(logs, 'run_mission') >= 1,
     'body-activated': uniqueCompletedDates(logs, (log) => fitnessCategories.has(log.category)) >= 7,
     'stronger-week': fitnessCount >= 10,
     'book-starter': readingCount >= 1,
-    'reader-10': readingCount >= 5,
-    'page-collector': readingCount >= 5,
+    'reader-10': readingMinutes >= 50 || readingCount >= 5,
+    'page-collector': readingMinutes >= 100 || readingCount >= 5,
     'knowledge-seeker': readingCount >= 10,
-    'night-reader': hasTitle(logs, 'sebelum tidur'),
+    'night-reader': metricTotal(logs, 'night_reading') >= 5 || hasTitle(logs, 'sebelum tidur'),
     'consistent-reader': uniqueCompletedDates(logs, (log) => readingCategories.has(log.category)) >= 7,
-    'calm-start': meditationCount >= 1,
-    'quiet-mind': meditationCount >= 5,
+    'calm-start': meditationMissions >= 1,
+    'quiet-mind': meditationMissions >= 5,
     'breathing-master':
-      meditationCount + countBy(logs, (log) => log.title?.toLowerCase().includes('napas')) >= 10,
+      meditationMissions +
+        metricTotal(logs, 'mindfulness_mission') +
+        countBy(logs, (log) => log.title?.toLowerCase().includes('napas')) >=
+      10,
     'peaceful-week': uniqueCompletedDates(logs, (log) => log.title?.toLowerCase().includes('meditasi')) >= 7,
-    'mind-reset': hasTitle(logs, 'refleksi'),
+    'mind-reset': metricTotal(logs, 'reflection_mission') >= 1 || hasTitle(logs, 'refleksi'),
     'inner-balance': mindfulnessCount >= 20,
-    'focus-mode': hasTitle(logs, 'fokus') || hasTitle(logs, 'deep work'),
+    'focus-mode': focusMinutes >= 5 || hasTitle(logs, 'fokus') || hasTitle(logs, 'deep work'),
     'task-finisher': productivityCount >= 10,
     'clean-desk': hasTitle(logs, 'rapikan') || hasTitle(logs, 'meja'),
-    'deep-work-rookie': hasTitle(logs, 'deep work'),
+    'deep-work-rookie': focusMinutes >= 25 || hasTitle(logs, 'deep work'),
     'anti-procrastination': skipped.length >= 1 && productivityCount >= 1,
     'productive-week': productivityCount >= 15,
     'level-5': user.level >= 5,
@@ -82,6 +96,7 @@ function achievementChecks({ logs, profile, user }) {
     'growth-machine': user.total_xp >= 5000,
     'discipline-master': user.total_xp >= 10000,
     'almost-rpg': user.level >= 4,
+    'cardio-starter': cardioMinutes >= 15,
   }
 }
 
