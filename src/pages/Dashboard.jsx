@@ -52,49 +52,52 @@ export function Dashboard({
 
   return (
     <div className="map-page">
-      <section className="world-map" style={{ backgroundImage: `url(${mapBackground})` }}>
-        <div className="map-shade" />
-        <div className="map-title">
-          <span className="eyebrow">World map</span>
-          <h1>LevelUp Self</h1>
-        </div>
-        <button className="mini-profile-button" onClick={() => setProfileOpen(true)} type="button">
-          <img alt="" src={miniProfileFrame} />
-          <div>
-            <strong>{user.name}</strong>
-            <span>Tier {user.level} - {user.total_xp} poin</span>
+      <section className="world-map">
+        <div className="map-canvas">
+          <img alt="" className="map-background" src={mapBackground} />
+          <div className="map-shade" />
+          <div className="map-title">
+            <span className="eyebrow">World map</span>
+            <h1>LevelUp Self</h1>
           </div>
-        </button>
-
-        {mapHotspots.map((hotspot) => (
-          <button
-            className={`map-hotspot ${hotspot.className}`}
-            key={hotspot.id}
-            onClick={() => onSelectEventCategory(hotspot.id)}
-            type="button"
-          >
-            <span>{hotspot.label}</span>
-            <small>{hotspot.title}</small>
+          <button className="mini-profile-button" onClick={() => setProfileOpen(true)} type="button">
+            <img alt="" src={miniProfileFrame} />
+            <div>
+              <strong>{user.name}</strong>
+              <span>Tier {user.level} - {user.total_xp} poin</span>
+            </div>
           </button>
-        ))}
 
-        <button className="map-hotspot achievement" onClick={() => onNavigate('achievements')} type="button">
-          <span>Achievement</span>
-          <small>Bangunan kanan</small>
-        </button>
+          {mapHotspots.map((hotspot) => (
+            <button
+              className={`map-hotspot ${hotspot.className}`}
+              key={hotspot.id}
+              onClick={() => onSelectEventCategory(hotspot.id)}
+              type="button"
+            >
+              <span>{hotspot.label}</span>
+              <small>{hotspot.title}</small>
+            </button>
+          ))}
 
-        <div className="map-quest-card">
-          <TierBadge tier={user.level} size="compact" />
-          <div>
-            <span>{progress.isMaxTier ? 'Tier maksimum' : `Menuju Tier ${progress.tier + 1}`}</span>
-            <strong>
-              {progress.isMaxTier
-                ? `${progress.gained} poin setelah Tier 7`
-                : `${progress.gained}/${progress.needed} XP`}
-            </strong>
-          </div>
-          <div className="progress-track">
-            <div style={{ width: `${progress.percent}%` }} />
+          <button className="map-hotspot achievement" onClick={() => onNavigate('achievements')} type="button">
+            <span>Achievement</span>
+            <small>Bangunan kanan</small>
+          </button>
+
+          <div className="map-quest-card">
+            <TierBadge tier={user.level} size="compact" />
+            <div>
+              <span>{progress.isMaxTier ? 'Tier maksimum' : `Menuju Tier ${progress.tier + 1}`}</span>
+              <strong>
+                {progress.isMaxTier
+                  ? `${progress.gained} poin setelah Tier 7`
+                  : `${progress.gained}/${progress.needed} XP`}
+              </strong>
+            </div>
+            <div className="progress-track">
+              <div style={{ width: `${progress.percent}%` }} />
+            </div>
           </div>
         </div>
       </section>

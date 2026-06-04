@@ -408,10 +408,30 @@ button:disabled {
 .world-map {
   position: relative;
   min-height: 100vh;
+  min-height: 100svh;
   overflow: hidden;
   isolation: isolate;
-  background-position: center;
-  background-size: cover;
+}
+
+.map-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100vw, calc(100svh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  transform: translate(-50%, -50%);
+  container-type: inline-size;
+}
+
+.map-background {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
 }
 
 .map-shade {
@@ -425,27 +445,28 @@ button:disabled {
 
 .map-title {
   position: absolute;
-  top: 32px;
-  left: 40px;
-  max-width: min(460px, calc(100% - 280px));
+  top: 3.2%;
+  left: 2.7%;
+  max-width: 34%;
   text-shadow: 0 3px 18px rgba(0, 0, 0, 0.58);
 }
 
 .map-title h1 {
   margin: 6px 0 0;
   color: #fff7d6;
-  font-size: clamp(34px, 5vw, 76px);
+  font-size: clamp(36px, 5.1cqw, 96px);
   line-height: 0.95;
 }
 
 .mini-profile-button {
   position: absolute;
-  top: 24px;
-  right: 28px;
+  top: 5.4%;
+  right: 6.2%;
   display: grid;
-  width: min(360px, 34vw);
-  min-width: 250px;
-  min-height: 128px;
+  width: 18.8%;
+  min-width: 0;
+  aspect-ratio: 1024 / 576;
+  min-height: 0;
   border: 0;
   color: #fff7d6;
   background: transparent;
@@ -468,7 +489,7 @@ button:disabled {
   display: grid;
   align-content: center;
   min-height: 100%;
-  padding: 24px 38px 22px 112px;
+  padding: 18% 11% 12% 32%;
 }
 
 .mini-profile-button strong,
@@ -480,12 +501,12 @@ button:disabled {
 
 .mini-profile-button strong {
   color: #fff7d6;
-  font-size: 18px;
+  font-size: clamp(12px, 1.1cqw, 22px);
 }
 
 .mini-profile-button span {
   color: #d8c399;
-  font-size: 12px;
+  font-size: clamp(9px, 0.72cqw, 14px);
   font-weight: 800;
 }
 
@@ -530,52 +551,52 @@ button:disabled {
 .map-hotspot span {
   color: #fff7d6;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(18px, 2vw, 30px);
+  font-size: clamp(18px, 2cqw, 38px);
   font-weight: 900;
 }
 
 .map-hotspot small {
   color: #f8d88d;
-  font-size: 11px;
+  font-size: clamp(9px, 0.82cqw, 14px);
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .map-hotspot.mountain {
-  left: 14%;
-  top: 48%;
+  left: 14.8%;
+  top: 48.5%;
 }
 
 .map-hotspot.library {
-  left: 33%;
-  top: 72%;
+  left: 33.2%;
+  top: 72.2%;
 }
 
 .map-hotspot.island {
-  left: 50%;
-  top: 59%;
+  left: 51.2%;
+  top: 60.2%;
   transform: translateX(-50%);
 }
 
 .map-hotspot.road {
-  right: 17%;
-  top: 74%;
+  right: 18.2%;
+  top: 74.8%;
 }
 
 .map-hotspot.achievement {
-  right: 10%;
-  top: 43%;
+  right: 8.8%;
+  top: 43.8%;
 }
 
 .map-quest-card {
   position: absolute;
-  left: 32px;
-  bottom: 30px;
+  left: 2.1%;
+  bottom: 3.6%;
   display: grid;
   grid-template-columns: auto minmax(120px, 1fr);
   gap: 12px 14px;
-  width: min(430px, calc(100% - 64px));
+  width: 28.5%;
   padding: 12px;
   border: 1px solid rgba(246, 196, 83, 0.28);
   border-radius: 8px;
@@ -1699,47 +1720,6 @@ button:disabled {
     display: block;
   }
 
-  .world-map {
-    min-height: 760px;
-  }
-
-  .map-title {
-    top: 22px;
-    left: 20px;
-    max-width: calc(100% - 40px);
-  }
-
-  .mini-profile-button {
-    top: 112px;
-    right: 18px;
-    width: min(330px, calc(100% - 36px));
-  }
-
-  .map-hotspot.mountain {
-    left: 12%;
-    top: 42%;
-  }
-
-  .map-hotspot.library {
-    left: 28%;
-    top: 68%;
-  }
-
-  .map-hotspot.island {
-    left: 55%;
-    top: 56%;
-  }
-
-  .map-hotspot.road {
-    right: 10%;
-    top: 72%;
-  }
-
-  .map-hotspot.achievement {
-    right: 8%;
-    top: 38%;
-  }
-
   .map-profile-panel {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -1808,60 +1788,31 @@ button:disabled {
   }
 
   .world-map {
-    min-height: 720px;
-    background-position: 43% center;
+    min-height: max(560px, 100svh);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .map-canvas {
+    left: 0;
+    width: max(900px, 100vw);
+    transform: translateY(-50%);
   }
 
   .map-title h1 {
-    font-size: 34px;
-  }
-
-  .mini-profile-button {
-    min-width: 0;
-    min-height: 104px;
-  }
-
-  .mini-profile-button div {
-    padding: 20px 30px 18px 92px;
+    font-size: clamp(34px, 5.1cqw, 96px);
   }
 
   .map-hotspot span {
-    font-size: 17px;
+    font-size: clamp(17px, 2cqw, 38px);
   }
 
   .map-hotspot small {
     display: none;
   }
 
-  .map-hotspot.mountain {
-    left: 10%;
-    top: 41%;
-  }
-
-  .map-hotspot.library {
-    left: 22%;
-    top: 66%;
-  }
-
-  .map-hotspot.island {
-    left: 58%;
-    top: 55%;
-  }
-
-  .map-hotspot.road {
-    right: 9%;
-    top: 70%;
-  }
-
-  .map-hotspot.achievement {
-    right: 5%;
-    top: 36%;
-  }
-
   .map-quest-card {
-    left: 14px;
-    bottom: 16px;
-    width: calc(100% - 28px);
+    width: 320px;
   }
 
   .map-content {
