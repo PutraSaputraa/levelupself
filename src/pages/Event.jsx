@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { eventCategories } from '../data/appData'
 
-export function Event({ eventLogs, initialCategoryId = null, onComplete }) {
-  const [activeCategoryId, setActiveCategoryId] = useState(initialCategoryId)
+export function Event({ eventLogs, onComplete }) {
+  const [activeCategoryId, setActiveCategoryId] = useState(null)
   const activeCategory = eventCategories.find((item) => item.id === activeCategoryId)
   const completionCounts = useMemo(
     () =>

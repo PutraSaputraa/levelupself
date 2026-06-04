@@ -13,10 +13,9 @@ const navItems = [
 
 export function AppShell({ activePage, children, isAdmin, onLogout, onNavigate }) {
   const visibleNavItems = isAdmin ? [...navItems, ['admin', 'Admin']] : navItems
-  const isMapMode = activePage === 'dashboard'
 
   return (
-    <main className={classNames('app-shell', isMapMode && 'map-shell')}>
+    <main className="app-shell">
       <aside className="sidebar">
         <div className="brand">
           <span className="brand-mark">
