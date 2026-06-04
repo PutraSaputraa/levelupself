@@ -60,6 +60,7 @@ function App() {
   const [logs, setLogs] = useState([])
   const [authMode, setAuthMode] = useState('login')
   const [activePage, setActivePage] = useState('dashboard')
+  const [activeEventCategory, setActiveEventCategory] = useState(null)
   const [tierUp, setTierUp] = useState(null)
   const [feedbackMission, setFeedbackMission] = useState(null)
   const [pendingAction, setPendingAction] = useState(null)
@@ -408,6 +409,11 @@ function App() {
           dailyMissions={todayMissions}
           missionMap={missionMap}
           onComplete={(dailyMission) => requestMissionAction('complete', dailyMission)}
+          onNavigate={setActivePage}
+          onSelectEventCategory={(categoryId) => {
+            setActiveEventCategory(categoryId)
+            setActivePage('event')
+          }}
           onSkip={(dailyMission) => requestMissionAction('skip', dailyMission)}
           progress={progress}
           user={user}
@@ -435,6 +441,7 @@ function App() {
       )}
       {visiblePage === 'event' && (
         <Event
+          initialCategoryId={activeEventCategory}
           eventLogs={logs.filter((log) => log.source === 'event' && log.status === 'completed')}
           onComplete={(eventMission) =>
             requestMissionAction('complete', { mission_id: eventMission.id }, 'event', eventMission)

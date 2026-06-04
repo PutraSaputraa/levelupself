@@ -387,6 +387,324 @@ button:disabled {
   padding: 28px;
 }
 
+.map-shell {
+  display: block;
+}
+
+.map-shell .sidebar {
+  display: none;
+}
+
+.map-shell .content {
+  width: 100%;
+  padding: 0;
+}
+
+.map-page {
+  min-height: 100vh;
+  background: #080913;
+}
+
+.world-map {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  isolation: isolate;
+  background-position: center;
+  background-size: cover;
+}
+
+.map-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(8, 9, 19, 0.1), rgba(8, 9, 19, 0.22) 58%, rgba(8, 9, 19, 0.82)),
+    radial-gradient(circle at 50% 44%, transparent 30%, rgba(8, 9, 19, 0.22) 82%);
+}
+
+.map-title {
+  position: absolute;
+  top: 32px;
+  left: 40px;
+  max-width: min(460px, calc(100% - 280px));
+  text-shadow: 0 3px 18px rgba(0, 0, 0, 0.58);
+}
+
+.map-title h1 {
+  margin: 6px 0 0;
+  color: #fff7d6;
+  font-size: clamp(34px, 5vw, 76px);
+  line-height: 0.95;
+}
+
+.mini-profile-button {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  display: grid;
+  width: min(360px, 34vw);
+  min-width: 250px;
+  min-height: 128px;
+  border: 0;
+  color: #fff7d6;
+  background: transparent;
+  text-align: left;
+}
+
+.mini-profile-button img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.42));
+}
+
+.mini-profile-button div {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  min-height: 100%;
+  padding: 24px 38px 22px 112px;
+}
+
+.mini-profile-button strong,
+.mini-profile-button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-profile-button strong {
+  color: #fff7d6;
+  font-size: 18px;
+}
+
+.mini-profile-button span {
+  color: #d8c399;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.map-hotspot {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  gap: 3px;
+  border: 0;
+  border-radius: 0;
+  padding: 0 0 5px;
+  color: #fff7d6;
+  background: transparent;
+  text-align: center;
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.75),
+    0 0 14px rgba(246, 196, 83, 0.42);
+}
+
+.map-hotspot::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #fff7d6, #f6c453, transparent);
+  transform: translateX(-50%);
+  transition:
+    left 0.18s ease,
+    right 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.map-hotspot:hover::before,
+.map-hotspot:focus-visible::before {
+  left: -12px;
+  right: -12px;
+  box-shadow: 0 0 16px rgba(246, 196, 83, 0.7);
+}
+
+.map-hotspot span {
+  color: #fff7d6;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(18px, 2vw, 30px);
+  font-weight: 900;
+}
+
+.map-hotspot small {
+  color: #f8d88d;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.map-hotspot.mountain {
+  left: 14%;
+  top: 48%;
+}
+
+.map-hotspot.library {
+  left: 33%;
+  top: 72%;
+}
+
+.map-hotspot.island {
+  left: 50%;
+  top: 59%;
+  transform: translateX(-50%);
+}
+
+.map-hotspot.road {
+  right: 17%;
+  top: 74%;
+}
+
+.map-hotspot.achievement {
+  right: 10%;
+  top: 43%;
+}
+
+.map-quest-card {
+  position: absolute;
+  left: 32px;
+  bottom: 30px;
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr);
+  gap: 12px 14px;
+  width: min(430px, calc(100% - 64px));
+  padding: 12px;
+  border: 1px solid rgba(246, 196, 83, 0.28);
+  border-radius: 8px;
+  color: #fff7d6;
+  background: rgba(8, 9, 19, 0.58);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.4);
+}
+
+.map-quest-card > div:nth-child(2) {
+  display: grid;
+  align-content: center;
+}
+
+.map-quest-card span,
+.map-quest-card strong {
+  display: block;
+}
+
+.map-quest-card span {
+  color: #d8c399;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.map-quest-card strong {
+  color: #fff7d6;
+  font-size: 18px;
+}
+
+.map-quest-card .progress-track {
+  grid-column: 1 / -1;
+}
+
+.map-content {
+  width: min(1220px, calc(100% - 56px));
+  margin: 0 auto;
+  padding: 28px 0 42px;
+}
+
+.profile-map-backdrop {
+  background: rgba(4, 7, 14, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.map-profile-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.72fr) minmax(420px, 1fr);
+  gap: 42px;
+  width: min(1440px, calc(100% - 48px));
+  min-height: min(78vh, 760px);
+  overflow: hidden;
+  border-radius: 8px;
+  padding: clamp(48px, 7vw, 110px) clamp(52px, 7vw, 118px);
+  color: #fff7d6;
+  background-position: center;
+  background-size: cover;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.55);
+}
+
+.profile-close {
+  position: absolute;
+  top: clamp(38px, 5vw, 78px);
+  right: clamp(60px, 7vw, 132px);
+  min-width: 170px;
+  min-height: 46px;
+  border: 1px solid rgba(246, 196, 83, 0.46);
+  border-radius: 999px;
+  color: #fff7d6;
+  background: rgba(8, 9, 19, 0.64);
+  font-weight: 900;
+}
+
+.map-profile-left {
+  display: grid;
+  align-content: center;
+  gap: 26px;
+  min-width: 0;
+}
+
+.map-profile-name h2 {
+  margin: 8px 0 6px;
+  color: #fff7d6;
+  font-size: clamp(34px, 4vw, 64px);
+}
+
+.map-profile-name p {
+  margin: 0;
+  color: #d8c399;
+  font-weight: 900;
+}
+
+.map-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 26px;
+  align-content: center;
+  padding-top: 42px;
+}
+
+.map-profile-stats div {
+  min-height: 112px;
+  padding: 22px 24px;
+  border: 1px solid rgba(246, 196, 83, 0.38);
+  border-radius: 8px;
+  background: rgba(8, 9, 19, 0.42);
+}
+
+.map-profile-stats span,
+.map-profile-stats strong {
+  display: block;
+}
+
+.map-profile-stats span {
+  color: #d8c399;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.map-profile-stats strong {
+  margin-top: 8px;
+  color: #fff7d6;
+  font-size: clamp(28px, 3vw, 44px);
+}
+
 .page-stack {
   display: grid;
   gap: 18px;
@@ -1381,6 +1699,65 @@ button:disabled {
     display: block;
   }
 
+  .world-map {
+    min-height: 760px;
+  }
+
+  .map-title {
+    top: 22px;
+    left: 20px;
+    max-width: calc(100% - 40px);
+  }
+
+  .mini-profile-button {
+    top: 112px;
+    right: 18px;
+    width: min(330px, calc(100% - 36px));
+  }
+
+  .map-hotspot.mountain {
+    left: 12%;
+    top: 42%;
+  }
+
+  .map-hotspot.library {
+    left: 28%;
+    top: 68%;
+  }
+
+  .map-hotspot.island {
+    left: 55%;
+    top: 56%;
+  }
+
+  .map-hotspot.road {
+    right: 10%;
+    top: 72%;
+  }
+
+  .map-hotspot.achievement {
+    right: 8%;
+    top: 38%;
+  }
+
+  .map-profile-panel {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    overflow-y: auto;
+    min-height: min(86vh, 820px);
+    padding: 72px 36px 42px;
+  }
+
+  .profile-close {
+    top: 24px;
+    right: 32px;
+  }
+
+  .map-profile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-top: 0;
+  }
+
   .sidebar {
     position: static;
     height: auto;
@@ -1424,6 +1801,87 @@ button:disabled {
 
   .content {
     padding: 16px;
+  }
+
+  .map-shell .content {
+    padding: 0;
+  }
+
+  .world-map {
+    min-height: 720px;
+    background-position: 43% center;
+  }
+
+  .map-title h1 {
+    font-size: 34px;
+  }
+
+  .mini-profile-button {
+    min-width: 0;
+    min-height: 104px;
+  }
+
+  .mini-profile-button div {
+    padding: 20px 30px 18px 92px;
+  }
+
+  .map-hotspot span {
+    font-size: 17px;
+  }
+
+  .map-hotspot small {
+    display: none;
+  }
+
+  .map-hotspot.mountain {
+    left: 10%;
+    top: 41%;
+  }
+
+  .map-hotspot.library {
+    left: 22%;
+    top: 66%;
+  }
+
+  .map-hotspot.island {
+    left: 58%;
+    top: 55%;
+  }
+
+  .map-hotspot.road {
+    right: 9%;
+    top: 70%;
+  }
+
+  .map-hotspot.achievement {
+    right: 5%;
+    top: 36%;
+  }
+
+  .map-quest-card {
+    left: 14px;
+    bottom: 16px;
+    width: calc(100% - 28px);
+  }
+
+  .map-content {
+    width: min(100% - 20px, 1220px);
+    padding-top: 18px;
+  }
+
+  .map-profile-panel {
+    width: calc(100% - 20px);
+    padding: 70px 18px 28px;
+  }
+
+  .profile-close {
+    right: 18px;
+    min-width: 112px;
+  }
+
+  .map-profile-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .hero-stats,
