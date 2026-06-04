@@ -1,3 +1,4 @@
+import tier7Icon from '../assets/tier7_icon.png'
 import { classNames } from '../lib/classNames'
 
 const navItems = [
@@ -17,10 +18,12 @@ export function AppShell({ activePage, children, isAdmin, onLogout, onNavigate }
     <main className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-mark">LU</span>
+          <span className="brand-mark">
+            <img alt="" src={tier7Icon} />
+          </span>
           <div>
             <strong>LevelUp Self</strong>
-            <small>Personal growth RPG</small>
+            <small>Tier quest RPG</small>
           </div>
         </div>
         <nav>

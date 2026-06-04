@@ -94,7 +94,7 @@ function achievementChecks({ logs, profile, user }) {
     'recovery-reset': hasTitle(logs, 'tidur') || hasTitle(logs, 'stretching'),
     'stamina-week': staminaCount >= 15,
     'level-5': user.level >= 5,
-    'level-10': user.level >= 10,
+    'level-10': user.level >= 7,
     'xp-collector': user.total_xp >= 1000,
     'growth-machine': user.total_xp >= 5000,
     'discipline-master': user.total_xp >= 10000,

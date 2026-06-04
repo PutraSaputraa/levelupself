@@ -35,7 +35,7 @@ import {
 } from './lib/firebaseStore'
 import { getXpCategory } from './lib/categoryXp'
 import { getFirebaseErrorMessage } from './lib/firebaseErrors'
-import { getLevelFromXp, getLevelProgress } from './lib/leveling'
+import { getTierFromXp, getTierProgress } from './lib/leveling'
 import { recommendDailyMissions } from './lib/recommendations'
 import { Achievements } from './pages/Achievements'
 import { Admin } from './pages/Admin'
@@ -60,12 +60,12 @@ function App() {
   const [logs, setLogs] = useState([])
   const [authMode, setAuthMode] = useState('login')
   const [activePage, setActivePage] = useState('dashboard')
-  const [levelUp, setLevelUp] = useState(null)
+  const [tierUp, setTierUp] = useState(null)
   const [feedbackMission, setFeedbackMission] = useState(null)
   const [pendingAction, setPendingAction] = useState(null)
   const [actionBusy, setActionBusy] = useState(false)
 
-  const progress = getLevelProgress(user?.total_xp ?? 0)
+  const progress = getTierProgress(user?.total_xp ?? 0)
   const visiblePage = activePage === 'admin' && user && !user.is_admin ? 'dashboard' : activePage
   const friendIds = useMemo(() => {
     if (!user) return []
@@ -132,11 +132,11 @@ function App() {
 
   useEffect(() => {
     if (!user) return
-    const computedLevel = getLevelFromXp(user.total_xp)
-    if (user.level === computedLevel) return
+    const computedTier = getTierFromXp(user.total_xp)
+    if (user.level === computedTier) return
 
-    updateUser(user.id, { level: computedLevel }).catch((error) => {
-      console.warn('Level sync skipped:', error.message)
+    updateUser(user.id, { level: computedTier }).catch((error) => {
+      console.warn('Tier sync skipped:', error.message)
     })
   }, [user])
 
@@ -205,7 +205,7 @@ function App() {
   async function completeMission(dailyMission) {
     const mission = missionMap[dailyMission.mission_id]
     const nextXp = user.total_xp + mission.xp_reward
-    const nextLevel = getLevelFromXp(nextXp)
+    const nextTier = getTierFromXp(nextXp)
     const nextStreak = user.last_completed_date === todayKey() ? user.streak : user.streak + 1
     const completedAt = new Date().toISOString()
     const xpCategory = getXpCategory(mission)
@@ -233,7 +233,7 @@ function App() {
     })
     await updateUser(user.id, {
       total_xp: nextXp,
-      level: nextLevel,
+      level: nextTier,
       [`category_xp.${xpCategory}`]: incrementBy(mission.xp_reward),
       [`category_completed.${xpCategory}`]: incrementBy(1),
       completed_count: incrementBy(1),
@@ -243,7 +243,7 @@ function App() {
     })
 
     setFeedbackMission(mission)
-    if (nextLevel > user.level) setLevelUp(nextLevel)
+    if (nextTier > user.level) setTierUp(nextTier)
   }
 
   async function skipMission(dailyMission, reason = '') {
@@ -278,7 +278,7 @@ function App() {
   async function completeEventMission(eventMission) {
     const completedAt = new Date().toISOString()
     const nextXp = user.total_xp + eventMission.xp_reward
-    const nextLevel = getLevelFromXp(nextXp)
+    const nextTier = getTierFromXp(nextXp)
     const xpCategory = getXpCategory(eventMission)
 
     await addMissionLog({
@@ -304,13 +304,13 @@ function App() {
     })
     await updateUser(user.id, {
       total_xp: nextXp,
-      level: nextLevel,
+      level: nextTier,
       [`category_xp.${xpCategory}`]: incrementBy(eventMission.xp_reward),
       [`category_completed.${xpCategory}`]: incrementBy(1),
       completed_count: incrementBy(1),
     })
 
-    if (nextLevel > user.level) setLevelUp(nextLevel)
+    if (nextTier > user.level) setTierUp(nextTier)
   }
 
   async function confirmMissionAction(reason) {
@@ -456,7 +456,7 @@ function App() {
         <Admin missions={missions} onChange={handleMissionChange} user={user} />
       )}
 
-      {levelUp && <LevelUpModal level={levelUp} onClose={() => setLevelUp(null)} />}
+      {tierUp && <LevelUpModal tier={tierUp} onClose={() => setTierUp(null)} />}
       {feedbackMission && (
         <FeedbackModal
           mission={feedbackMission}

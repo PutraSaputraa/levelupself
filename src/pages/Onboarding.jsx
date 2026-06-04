@@ -44,7 +44,7 @@ export function Onboarding({ initialProfile, onSave }) {
           field="activity_level"
           items={surveyOptions.activity_level}
           onChange={setProfile}
-          title="Level aktivitas"
+          title="Tier aktivitas"
           value={profile.activity_level}
         />
         <MultiChoice

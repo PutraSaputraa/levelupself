@@ -23,7 +23,7 @@ export function Progress({ user, userLogs }) {
           <h2>Ringkasan</h2>
           <div className="metric-row">
             <div>
-              <span>Level</span>
+              <span>Tier</span>
               <strong>{user.level}</strong>
             </div>
             <div>

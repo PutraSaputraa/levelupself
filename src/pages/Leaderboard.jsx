@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { TierBadge } from '../components/TierBadge'
 import { eventCategories } from '../data/appData'
 import { classNames } from '../lib/classNames'
 import { getLeaderboard } from '../lib/leaderboard'
@@ -55,7 +56,7 @@ export function Leaderboard({ currentUserId, friendIds = [], logs, users }) {
               <span className="eyebrow">Category board</span>
               <h2>Peringkat berdasarkan kategori XP</h2>
             </div>
-            <span className="date-chip">Level tetap total XP</span>
+            <span className="date-chip">Tier dari total poin</span>
           </div>
           <div className="leaderboard-category-grid">
             {eventCategories.map((category) => (
@@ -166,7 +167,7 @@ function LeaderboardBoard({ board, categoryName, currentUserId, title, type }) {
                     {player.displayRank === 1 ? 'Top Player' : `Challenger ${player.displayRank}`}
                   </span>
                 </div>
-                <div className="player-avatar">{player.name.slice(0, 2).toUpperCase()}</div>
+                <TierBadge tier={player.level} size="compact" />
                 <div className="podium-body">
                   <h2>{player.name}</h2>
                   <strong>{player.score} pts</strong>
@@ -199,7 +200,7 @@ function LeaderboardBoard({ board, categoryName, currentUserId, title, type }) {
                   <strong>{player.score}</strong>
                 </div>
                 <div>
-                  <span>Level</span>
+                  <span>Tier</span>
                   <strong>{player.level}</strong>
                 </div>
                 <div>

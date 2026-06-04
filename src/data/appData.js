@@ -54,7 +54,7 @@ export const achievementGroups = [
       { id: 'new-adventurer', name: 'New Adventurer', description: 'Menyelesaikan onboarding survey', reward: '30 XP' },
       { id: 'day-one-hero', name: 'Day One Hero', description: 'Menyelesaikan semua misi di hari pertama', reward: '75 XP' },
       { id: 'starter-pack', name: 'Starter Pack', description: 'Menyelesaikan 3 misi pertama', reward: '100 XP' },
-      { id: 'level-up-rookie', name: 'Level Up Rookie', description: 'Naik ke level 2', reward: 'Badge' },
+      { id: 'level-up-rookie', name: 'Tier Initiate', description: 'Naik ke Tier 2', reward: 'Badge' },
     ],
   },
   {
@@ -128,15 +128,15 @@ export const achievementGroups = [
     ],
   },
   {
-    id: 'level-xp',
-    title: 'Achievement level dan XP',
+    id: 'tier-xp',
+    title: 'Achievement Tier dan poin',
     items: [
-      { id: 'level-5', name: 'Level 5 Reached', description: 'Mencapai level 5', reward: 'Badge' },
-      { id: 'level-10', name: 'Level 10 Hero', description: 'Mencapai level 10', reward: 'Badge spesial' },
+      { id: 'level-5', name: 'Tier 5 Reached', description: 'Mencapai Tier 5', reward: 'Badge' },
+      { id: 'level-10', name: 'Tier 7 Dragonlord', description: 'Mencapai Tier 7', reward: 'Badge spesial' },
       { id: 'xp-collector', name: 'XP Collector', description: 'Mengumpulkan 1.000 XP', reward: '100 XP bonus' },
       { id: 'growth-machine', name: 'Growth Machine', description: 'Mengumpulkan 5.000 XP', reward: 'Badge' },
       { id: 'discipline-master', name: 'Discipline Master', description: 'Mengumpulkan 10.000 XP', reward: 'Title spesial' },
-      { id: 'almost-rpg', name: 'Almost RPG', description: 'Naik level 3 kali dalam sebulan', reward: 'Badge' },
+      { id: 'almost-rpg', name: 'RPG Awakening', description: 'Mencapai Tier 4', reward: 'Badge' },
     ],
   },
 ]

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChoiceGroup } from '../components/ChoiceGroup'
+import { TierBadge } from '../components/TierBadge'
 import { surveyOptions } from '../data/appData'
 
 export function Profile({ onSave, profile, user, userLogs }) {
@@ -24,7 +25,7 @@ export function Profile({ onSave, profile, user, userLogs }) {
 
       <section className="profile-grid">
         <div className="panel profile-hero">
-          <div className="player-avatar profile-avatar">{user.name.slice(0, 2).toUpperCase()}</div>
+          <TierBadge tier={user.level} size="large" />
           <div>
             <span className="eyebrow">Player ID</span>
             <h2>{user.friend_code}</h2>
@@ -35,7 +36,7 @@ export function Profile({ onSave, profile, user, userLogs }) {
           <h2>Progress</h2>
           <div className="profile-stats">
             <div>
-              <span>Level</span>
+              <span>Tier</span>
               <strong>{user.level}</strong>
             </div>
             <div>

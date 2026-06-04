@@ -1,5 +1,6 @@
 import { HistoryPanel } from '../components/HistoryPanel'
 import { MissionCard } from '../components/MissionCard'
+import { TierBadge } from '../components/TierBadge'
 import { classNames } from '../lib/classNames'
 import { todayKey } from '../lib/date'
 
@@ -19,17 +20,29 @@ export function Dashboard({
     <div className="page-stack">
       <header className="topbar">
         <div>
-          <span className="eyebrow">Selamat datang</span>
+          <span className="eyebrow">Quest board</span>
           <h1>{user.name}</h1>
         </div>
-        <div className="level-pill">Level {user.level}</div>
+        <TierBadge tier={user.level} />
       </header>
 
       <section className="dashboard-grid">
-        <div className="panel xp-panel">
+        <div className="panel xp-panel tier-panel">
+          <div className="tier-hero">
+            <TierBadge tier={user.level} size="large" />
+            <div>
+              <span className="eyebrow">Current rank</span>
+              <h2>Tier {user.level}</h2>
+              <p>
+                {progress.isMaxTier
+                  ? 'Tier maksimum tercapai. Sekarang kumpulkan poin sebanyak mungkin.'
+                  : `Naikkan XP untuk membuka Tier ${progress.tier + 1}.`}
+              </p>
+            </div>
+          </div>
           <div className="metric-row">
             <div>
-              <span>Total XP</span>
+              <span>Total poin</span>
               <strong>{user.total_xp}</strong>
             </div>
             <div>
@@ -42,9 +55,9 @@ export function Dashboard({
             </div>
           </div>
           <div className="progress-label">
-            <span>Progress ke Level {progress.level + 1}</span>
+            <span>{progress.isMaxTier ? 'Tier maksimum' : `Progress ke Tier ${progress.tier + 1}`}</span>
             <span>
-              {progress.gained}/{progress.needed} XP
+              {progress.isMaxTier ? `${progress.gained} poin setelah Tier 7` : `${progress.gained}/${progress.needed} XP`}
             </span>
           </div>
           <div className="progress-track">

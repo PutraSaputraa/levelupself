@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { TierBadge } from '../components/TierBadge'
 
 export function Friends({
   friendIds,
@@ -168,11 +169,11 @@ export function Friends({
           {friends.length === 0 && <p>Belum ada teman. Tambahkan dengan ID atau nama user.</p>}
           {friends.map((friend) => (
             <div className="friend-row" key={friend.id}>
-              <div className="player-avatar small">{friend.name.slice(0, 2).toUpperCase()}</div>
+              <TierBadge tier={friend.level} size="compact" />
               <div className="player-cell">
                 <strong>{friend.name}</strong>
                 <span>
-                  Level {friend.level} - {friend.total_xp} XP - {friend.friend_code}
+                  Tier {friend.level} - {friend.total_xp} XP - {friend.friend_code}
                 </span>
               </div>
             </div>
