@@ -1,9 +1,7 @@
 import { achievementGroups } from '../data/appData'
+import { getXpCategory } from './categoryXp'
 
-const fitnessCategories = new Set(['fitness', 'cardio', 'calistenic'])
-const productivityCategories = new Set(['productivity', 'skill'])
-const mindfulnessCategories = new Set(['mindfulness', 'reflection', 'recovery'])
-const readingCategories = new Set(['reading', 'learning'])
+const isCategory = (log, category) => getXpCategory(log) === category
 
 function completedLogs(logs) {
   return logs.filter((log) => log.status === 'completed')
@@ -35,10 +33,10 @@ function metricTotal(logs, type) {
 function achievementChecks({ logs, profile, user }) {
   const completed = completedLogs(logs)
   const skipped = logs.filter((log) => log.status === 'skipped')
-  const fitnessCount = countBy(logs, (log) => fitnessCategories.has(log.category))
-  const readingCount = countBy(logs, (log) => readingCategories.has(log.category))
-  const mindfulnessCount = countBy(logs, (log) => mindfulnessCategories.has(log.category))
-  const productivityCount = countBy(logs, (log) => productivityCategories.has(log.category))
+  const strengthCount = countBy(logs, (log) => isCategory(log, 'strength'))
+  const intelectCount = countBy(logs, (log) => isCategory(log, 'intelect'))
+  const mentalCount = countBy(logs, (log) => isCategory(log, 'mental'))
+  const staminaCount = countBy(logs, (log) => isCategory(log, 'stamina'))
   const pushUpTotal = metricTotal(logs, 'push_up')
   const readingMinutes = metricTotal(logs, 'reading_minutes')
   const focusMinutes = metricTotal(logs, 'focus_minutes')
@@ -62,18 +60,18 @@ function achievementChecks({ logs, profile, user }) {
     'restart-strong': completed.length >= 3 && skipped.length >= 1,
     'never-too-late': false,
     'fresh-start': skipped.length >= 1 && completed.length >= 1,
-    'mini-athlete': fitnessCount >= 5,
+    'mini-athlete': strengthCount >= 5,
     'push-up-starter': pushUpTotal >= 50,
     walker: countBy(logs, (log) => log.title?.toLowerCase().includes('jalan')) >= 5,
     'runner-seed': hasTitle(logs, 'lari') || metricTotal(logs, 'run_mission') >= 1,
-    'body-activated': uniqueCompletedDates(logs, (log) => fitnessCategories.has(log.category)) >= 7,
-    'stronger-week': fitnessCount >= 10,
-    'book-starter': readingCount >= 1,
-    'reader-10': readingMinutes >= 50 || readingCount >= 5,
-    'page-collector': readingMinutes >= 100 || readingCount >= 5,
-    'knowledge-seeker': readingCount >= 10,
+    'body-activated': uniqueCompletedDates(logs, (log) => isCategory(log, 'strength')) >= 7,
+    'stronger-week': strengthCount >= 10,
+    'book-starter': intelectCount >= 1,
+    'reader-10': readingMinutes >= 50 || intelectCount >= 5,
+    'page-collector': readingMinutes >= 100 || intelectCount >= 5,
+    'knowledge-seeker': intelectCount >= 10,
     'night-reader': metricTotal(logs, 'night_reading') >= 5 || hasTitle(logs, 'sebelum tidur'),
-    'consistent-reader': uniqueCompletedDates(logs, (log) => readingCategories.has(log.category)) >= 7,
+    'consistent-reader': uniqueCompletedDates(logs, (log) => isCategory(log, 'intelect')) >= 7,
     'calm-start': meditationMissions >= 1,
     'quiet-mind': meditationMissions >= 5,
     'breathing-master':
@@ -83,20 +81,25 @@ function achievementChecks({ logs, profile, user }) {
       10,
     'peaceful-week': uniqueCompletedDates(logs, (log) => log.title?.toLowerCase().includes('meditasi')) >= 7,
     'mind-reset': metricTotal(logs, 'reflection_mission') >= 1 || hasTitle(logs, 'refleksi'),
-    'inner-balance': mindfulnessCount >= 20,
+    'inner-balance': mentalCount >= 20,
     'focus-mode': focusMinutes >= 5 || hasTitle(logs, 'fokus') || hasTitle(logs, 'deep work'),
-    'task-finisher': productivityCount >= 10,
+    'task-finisher': intelectCount >= 10,
     'clean-desk': hasTitle(logs, 'rapikan') || hasTitle(logs, 'meja'),
     'deep-work-rookie': focusMinutes >= 25 || hasTitle(logs, 'deep work'),
-    'anti-procrastination': skipped.length >= 1 && productivityCount >= 1,
-    'productive-week': productivityCount >= 15,
+    'anti-procrastination': skipped.length >= 1 && intelectCount >= 1,
+    'productive-week': intelectCount >= 15,
+    'stamina-starter': staminaCount >= 1,
+    'endurance-builder': staminaCount >= 10,
+    'early-hydration': hasTitle(logs, 'minum air'),
+    'recovery-reset': hasTitle(logs, 'tidur') || hasTitle(logs, 'stretching'),
+    'stamina-week': staminaCount >= 15,
     'level-5': user.level >= 5,
     'level-10': user.level >= 10,
     'xp-collector': user.total_xp >= 1000,
     'growth-machine': user.total_xp >= 5000,
     'discipline-master': user.total_xp >= 10000,
     'almost-rpg': user.level >= 4,
-    'cardio-starter': cardioMinutes >= 15,
+    'cardio-starter': cardioMinutes >= 15 || staminaCount >= 3,
   }
 }
 

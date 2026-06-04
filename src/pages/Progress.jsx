@@ -1,9 +1,12 @@
 import { HistoryPanel } from '../components/HistoryPanel'
+import { getCategoryLabel } from '../data/categories'
+import { getXpCategory } from '../lib/categoryXp'
 
 export function Progress({ user, userLogs }) {
   const byCategory = userLogs.reduce((acc, log) => {
-    acc[log.category] ??= { completed: 0, skipped: 0 }
-    acc[log.category][log.status] += 1
+    const category = getXpCategory(log)
+    acc[category] ??= { completed: 0, skipped: 0 }
+    acc[category][log.status] += 1
     return acc
   }, {})
 
@@ -38,7 +41,7 @@ export function Progress({ user, userLogs }) {
           <div className="category-list">
             {Object.entries(byCategory).map(([category, stat]) => (
               <div key={category}>
-                <span>{category}</span>
+                <span>{getCategoryLabel(category)}</span>
                 <strong>
                   {stat.completed} done / {stat.skipped} skip
                 </strong>

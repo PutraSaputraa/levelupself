@@ -1,9 +1,7 @@
-export function getXpCategory(mission = {}) {
-  const rawCategory = mission.event_category ?? mission.category ?? 'general'
-  const aliases = {
-    productivity: 'focus',
-    reflection: 'mindfulness',
-  }
+import { categoryAliases } from '../data/categories'
 
-  return aliases[rawCategory] ?? rawCategory
+export function getXpCategory(mission = {}) {
+  const rawCategory = mission.xp_category ?? mission.event_category ?? mission.category ?? 'stamina'
+
+  return categoryAliases[rawCategory] ?? rawCategory
 }

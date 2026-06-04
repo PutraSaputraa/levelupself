@@ -108,9 +108,13 @@ function metricLabel(metricType) {
     push_up: 'push up',
     focus_minutes: 'menit fokus',
     cardio_minutes: 'menit cardio',
+    stamina_minutes: 'menit stamina',
     reading_minutes: 'menit membaca',
     meditation_mission: 'misi meditasi',
     mindfulness_mission: 'misi mindfulness',
+    mental_mission: 'misi mental',
+    strength_mission: 'misi strength',
+    intelect_mission: 'misi intelect',
   }
 
   return labels[metricType] ?? 'progres kategori'

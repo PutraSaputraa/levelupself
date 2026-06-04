@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Field } from '../components/Field'
+import { selfCategories } from '../data/categories'
 
 export function Admin({ missions, onChange, user }) {
   const [draft, setDraft] = useState({
     title: '',
     description: '',
-    category: 'habit',
+    category: 'strength',
     difficulty: 'very_light',
     duration_minutes: 5,
     xp_reward: 20,
@@ -57,12 +58,21 @@ export function Admin({ missions, onChange, user }) {
               value={draft.description}
             />
           </label>
-          <Field
-            label="Kategori"
-            name="category"
-            onChange={(event) => setDraft({ ...draft, category: event.target.value })}
-            value={draft.category}
-          />
+          <label className="field">
+            <span>Kategori</span>
+            <select
+              name="category"
+              onChange={(event) => setDraft({ ...draft, category: event.target.value })}
+              required
+              value={draft.category}
+            >
+              {selfCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
           <Field
             label="Durasi menit"
             name="duration"

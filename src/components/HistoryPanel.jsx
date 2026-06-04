@@ -1,4 +1,6 @@
+import { getCategoryLabel } from '../data/categories'
 import { classNames } from '../lib/classNames'
+import { getXpCategory } from '../lib/categoryXp'
 
 export function HistoryPanel({ logs }) {
   return (
@@ -15,7 +17,7 @@ export function HistoryPanel({ logs }) {
             <div>
               <strong>{log.title}</strong>
               <span>
-                {log.category} - {new Date(log.created_at).toLocaleString()}
+                {getCategoryLabel(getXpCategory(log))} - {new Date(log.created_at).toLocaleString()}
               </span>
             </div>
             <span className={classNames('status-chip', log.status)}>{log.status}</span>

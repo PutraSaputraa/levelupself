@@ -1,3 +1,11 @@
+import { getXpCategory } from './categoryXp'
+
+function categoryTotal(values = {}, categoryId) {
+  return Object.entries(values).reduce((total, [storedCategory, value]) => {
+    return getXpCategory({ category: storedCategory }) === categoryId ? total + Number(value ?? 0) : total
+  }, 0)
+}
+
 export function getLeaderboard(users, logs, options = {}) {
   const { categoryId = null } = options
 
@@ -6,19 +14,19 @@ export function getLeaderboard(users, logs, options = {}) {
       const userLogs = logs.filter((log) => {
         if (log.user_id !== user.id) return false
         if (!categoryId) return true
-        return log.xp_category === categoryId || log.event_category === categoryId
+        return getXpCategory(log) === categoryId
       })
       const completed = categoryId
-        ? user.category_completed?.[categoryId] ??
+        ? categoryTotal(user.category_completed, categoryId) ||
           userLogs.filter((log) => log.status === 'completed').length
         : user.completed_count ?? userLogs.filter((log) => log.status === 'completed').length
       const skipped = categoryId
-        ? user.category_skipped?.[categoryId] ??
+        ? categoryTotal(user.category_skipped, categoryId) ||
           userLogs.filter((log) => log.status === 'skipped').length
         : user.skipped_count ?? userLogs.filter((log) => log.status === 'skipped').length
       const attempts = completed + skipped
       const completionRate = attempts === 0 ? 0 : Math.round((completed / attempts) * 100)
-      const categoryXp = categoryId ? user.category_xp?.[categoryId] ?? 0 : user.total_xp
+      const categoryXp = categoryId ? categoryTotal(user.category_xp, categoryId) : user.total_xp
       const score = categoryId ? categoryXp : user.total_xp + user.streak * 20
 
       return {
